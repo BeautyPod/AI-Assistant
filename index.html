@@ -280,7 +280,7 @@ extras(){
 <div class="panel"><p class="eyebrow">Personaliza tu servicio</p><h1>¿Deseas agregar algo más?</h1>
 <div class="main-box"><b style="font-family:var(--fh);font-size:1.15rem">${svc(m).n}</b><p>${svc(m).d}</p><div class="price" style="${precio(m).pending?'font-size:1rem':''}">${fmtOP(precio(m))}</div></div>
 <h2>Servicios adicionales</h2><p class="note">Puedes elegir los que desees.</p>
-<div class="stack" role="group">${items.map(a=>`<button class="opt" role="checkbox" aria-checked="${ex.includes(a.id)}" data-extra="${a.id}"><span><b>${a.n}</b><small>${fmtOP(precio(a.id))}</small></span><span class="dot"></span></button>`).join("")}
+<div class="stack" role="group">${items.map(a=>`<button class="opt" role="checkbox" aria-checked="${ex.includes(a.id)}" data-extra="${a.id}"><span><b>${a.n}</b></span><span class="dot"></span></button>`).join("")}
 <button class="opt" role="checkbox" aria-checked="${S.none}" data-none><span><b>No deseo ningún servicio adicional</b></span><span class="dot"></span></button></div>
 <div class="sum"><p class="eyebrow">Resumen de tu selección</p>
 <div class="row"><span>Servicio principal</span><span>${fmtOP(precio(m))}</span></div>
