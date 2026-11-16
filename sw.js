@@ -1,7 +1,7 @@
-const CACHE="beautypod-ai-v4";
+const CACHE="beautypod-ai-v6";
 const CORE=["./","./index.html","./manifest.json","./icons/icon-192.png","./icons/icon-512.png","./img/una-encarnada.jpg","./img/verrugas.jpg","./img/mal-olor.jpg","./img/callosidades.jpg"];
 const OPTIONAL=["./assets/img/beautypod-logo.svg"];
-self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(async c=>{await c.addAll(CORE);await Promise.all(OPTIONAL.map(u=>c.add(u).catch(()=>{})))}))});
+self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(async c=>{await c.addAll(CORE);await Promise.all(OPTIONAL.map(u=>c.add(u).catch(()=>{})));self.skipWaiting()}))});
 self.addEventListener("message",e=>{if(e.data==="SKIP_WAITING")self.skipWaiting()});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
 self.addEventListener("fetch",e=>{
