@@ -228,7 +228,7 @@ const fmtOP = p => fmt(p) || '<span class="pend">Precio pendiente de confirmaci�
 const fmtTxt = p => fmt(p) || "Precio pendiente de confirmación";
 
 /* ============ 8. ESTADO ============ */
-let S={main:null,extras:[],none:false};
+let S={main:null,extras:[],none:false,nivel:{},locked:false,area:"limpiezas"};
 try{ S=Object.assign(S,JSON.parse(sessionStorage.getItem("bp_sel")||"{}")); }catch(e){}
 const save=()=>{try{sessionStorage.setItem("bp_sel",JSON.stringify(S))}catch(e){}};
 const extrasValidos=()=>S.extras.filter(e=>adicionalCompatible(e,S.main));
@@ -256,7 +256,7 @@ function logo(el){
   i.onload=()=>{el.innerHTML="";el.appendChild(i)}; i.onerror=()=>{};
   el.innerHTML=robot; i.src="assets/img/beautypod-logo.svg";
 }
-const back=(to,label="Volver")=>`<button class="back" data-go="${to}">← ${label}</button>`;
+const back=(to,label="Volver")=>(to==="home"&&S.locked)?"":`<button class="back" data-go="${to}">← ${label}</button>`;
 
 const V={
 home(){return `
@@ -302,7 +302,8 @@ ${ex.length?ex.map(e=>`<div class="row"><span>${ext(e).n}</span><span>${fmtOP(pr
 <div class="row t"><span>Total</span><span>${tot.pending?'<span class="pend" style="font-size:.85rem">Pendiente de confirmación</span>':fmt(tot)}</span></div></div>
 ${(tot.pending||rango)?'<p class="note">El importe puede variar según la valoración profesional.</p>':''}
 <p class="note">Este voucher es un resumen de tu selección. La cita no queda confirmada hasta que BeautyPod responda tu mensaje.</p>
-<button class="btn full" data-wa-voucher>Solicitar cita por WhatsApp</button></div>`},
+<button class="btn full" data-wa-voucher>Enviar mi decisión a la asistente</button>
+<button class="btn ghost full" style="margin-top:10px" data-wa-hablar="v">Deseo mejor hablar con la asistente</button></div>`},
 
 locales(){return back("home")+`
 <div class="panel"><p class="eyebrow">Tratamientos localizados</p><h1>¿Qué problema deseas atender?</h1>
@@ -311,16 +312,18 @@ locales(){return back("home")+`
 
 problema(id){
   const p=PROBLEMAS.find(x=>x.id===id); if(!p) return V.locales();
-  const pr=precio(id);
+  const pr=precio(id), niv=p.niveles||[], sel=(S.nivel||{})[id]||null, nivSel=niv.find(x=>x[0]===sel);
   return back("locales")+`
 <div class="panel"><p class="eyebrow">Tratamientos localizados</p><h1>${p.n}</h1>
 ${p.img?`<img class="photo hero-img" src="img/${p.img}.jpg" alt="${p.n}">`:""}
 <p class="lead">${p.t}</p><p style="margin:0 0 14px">${p.a}</p>
-${pr.pending?"":`<div class="main-box"><p>Rango de precio informativo</p><div class="price">${fmt(pr)}</div><p style="margin:8px 0 0">El precio depende del diagnóstico realizado por la especialista.</p></div>`}
-${(p.niveles||[]).length?`<div class="sum"><p class="eyebrow">Precio según la gravedad</p>${p.niveles.map(([id,n,d])=>`<div class="row"><span>${n}<small style="display:block;color:var(--muted);font-weight:400">${d}</small></span><span>${fmtOP(precio(id))}</span></div>`).join("")}</div>`:""}
-<p class="note">La información es orientativa y no constituye un diagnóstico. La decisión del tratamiento corresponde a la profesional tras la valoración.</p>
+${niv.length?`<h2 style="margin:6px 0 4px">¿Cómo se encuentra?</h2><p class="note" style="margin-top:0">Marca la opción que más se parezca a tu caso.</p>
+<div class="stack" role="radiogroup">${niv.map(([lid,n,d])=>`<button class="opt" role="radio" aria-checked="${sel===lid}" data-nivel="${p.id}|${lid}"><span><b>${n}</b><small>${d}</small></span><span class="dot"></span></button>`).join("")}</div>
+${sel?`<div class="main-box"><p>Precio para «${nivSel[1]}»</p><div class="price">${fmtOP(precio(sel))}</div><p style="margin:8px 0 0">El precio depende del diagnóstico realizado por la especialista.</p></div>`:""}`
+:(pr.pending?"":`<div class="main-box"><p>Rango de precio informativo</p><div class="price">${fmt(pr)}</div><p style="margin:8px 0 0">El precio depende del diagnóstico realizado por la especialista.</p></div>`)}
 <p class="note" style="margin-top:0">Si deseas más detalles, puedes hablar con la asistente por WhatsApp.</p>
-<button class="btn full" data-wa-prob="${p.id}">Enviar mi consulta por WhatsApp</button></div>`}
+<button class="btn full" data-wa-prob="${p.id}">Enviar mi decisión a la asistente</button>
+<button class="btn ghost full" style="margin-top:10px" data-wa-hablar="${p.id}">Deseo mejor hablar con la asistente</button></div>`}
 };
 
 /* ============ 11. NAVEGACIÓN ============ */
@@ -328,21 +331,28 @@ function route(){
   const [v,arg]=(location.hash.replace(/^#\/?/,"")||"home").split("/");
   let view=V[v]?v:"home";
   if((view==="extras"||view==="voucher")&&!svc(S.main)) view="limpiezas";
+  // Tras pasar 2 pantallas (tercera en adelante) ya no se puede volver a la primera
+  if(["extras","voucher","problema"].includes(view)){ S.locked=true; S.area=view==="problema"?"locales":"limpiezas"; save(); }
+  else if(view==="limpiezas"||view==="locales"){ S.area=view; save(); }
+  if(view==="home"&&S.locked){ location.replace("#/"+S.area); return; }
+  const lg=document.querySelector("header .brand"); if(lg) lg.setAttribute("href","#/"+(S.locked?S.area:"home"));
   document.getElementById("app").innerHTML=V[view](arg);
   window.scrollTo(0,0);
 }
 const go=p=>{location.hash="#/"+p};
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-go],[data-main],[data-extra],[data-none],[data-prob],[data-oni],[data-wa-voucher],[data-wa-prob]"); if(!t) return;
+  const t=e.target.closest("[data-go],[data-main],[data-extra],[data-none],[data-prob],[data-nivel],[data-oni],[data-wa-voucher],[data-wa-prob],[data-wa-hablar]"); if(!t) return;
   const d=t.dataset;
   if(d.go!==undefined) return go(d.go);
   if(d.main){ if(S.main!==d.main){S.extras=S.extras.filter(x=>adicionalCompatible(x,d.main));} S.main=d.main; save(); return go("extras"); }
   if(d.extra){ S.none=false; S.extras=S.extras.includes(d.extra)?S.extras.filter(x=>x!==d.extra):[...S.extras,d.extra]; save(); return route(); }
   if(d.none!==undefined){ S.none=!S.none; if(S.none) S.extras=[]; save(); return route(); }
   if(d.prob) return go("problema/"+d.prob);
+  if(d.nivel){ const [pid,lid]=d.nivel.split("|"); S.nivel=S.nivel||{}; if(S.nivel[pid]===lid) delete S.nivel[pid]; else S.nivel[pid]=lid; save(); return route(); }
   if(d.oni!==undefined) return abrirWA("Hola, BeautyPod. Quisiera conocer los tratamientos disponibles para la onicomicosis y recibir información sobre cómo puedo acceder a una valoración.");
+  if(d.waHablar){ let q; if(d.waHablar==="v") q=svc(S.main).n; else q=PROBLEMAS.find(x=>x.id===d.waHablar).n; return abrirWA("Hola, BeautyPod. Prefiero hablar con la asistente antes de decidir. Me interesa: "+q+"."); }
   if(d.waVoucher!==undefined) return abrirWA(textoVoucher());
-  if(d.waProb){ const p=PROBLEMAS.find(x=>x.id===d.waProb); return abrirWA("Hola, BeautyPod. Creo que tengo "+p.n.toLowerCase()+" y quisiera recibir atención. Me gustaría coordinar una cita."); }
+  if(d.waProb){ const p=PROBLEMAS.find(x=>x.id===d.waProb), l=(p.niveles||[]).find(x=>x[0]===(S.nivel||{})[p.id]); return abrirWA("Hola, BeautyPod. Creo que tengo "+p.n.toLowerCase()+(l?" ("+l[1]+")":"")+" y quisiera recibir atención. Me gustaría coordinar una cita."); }
 });
 window.addEventListener("hashchange",route);
 
