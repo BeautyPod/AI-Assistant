@@ -1,20 +1,12 @@
-BEAUTYPOD AI ASSISTANT — PRIMERA VERSIÓN
+BEAUTYPOD AI ASSISTANT
 
-Publicación:
-1. Descomprime el contenido.
-2. Sube index.html, manifest.json, sw.js e icons/ a la raíz del repositorio GitHub AI-Assistant.
-3. En GitHub: Settings > Pages > Deploy from a branch > main > /(root).
-4. Abre https://beautypod.github.io/AI-Assistant/
-
-Edición de precios:
-Abre index.html y busca CONFIG en el script inferior.
-- mainServices: servicios principales.
-- extras: servicios adicionales.
-- conditions: motivos de consulta y precios orientativos.
-Los importes están en CUP. Los rangos se suman como rangos y no se calcula un promedio.
-
-Notas:
-- La aplicación abre WhatsApp con un mensaje preparado; el cliente debe enviarlo manualmente.
-- El funcionamiento offline se activa tras la primera visita online y la instalación del Service Worker.
-- El logotipo se intenta cargar desde el repositorio Web existente. Si la ruta falla, aparece el icono de robot asistente.
-- Esta es una primera versión editable. Revisa precios, textos y compatibilidades antes de publicarla al público.
+PUBLICAR: sube index.html, manifest.json, sw.js, icons/, img/ y assets/ a la raíz del repositorio BeautyPod/AI-Assistant (Settings > Pages > main > /root).
+LOGO: copia beautypod-logo.svg del sitio original a assets/img/. Si no está, se muestra el icono robot provisional.
+PRECIOS (solo en el script de index.html):
+- MODALIDAD_GLOBAL = "CUP" o "USD".
+- CUP_PRECIO_ACTUAL_SANO: nuevo precio del Preventivo Completo (Sano).
+- USD_TASA_ACTUAL: nueva tasa CUP/USD.
+- CAMBIOS_ESPECIFICOS: precio de un concepto concreto (prevalece sobre lo global).
+- Tarifas con base:null están pendientes; para autorizarlas escribe su precio en CAMBIOS_ESPECIFICOS (o en base).
+- ajuste:false en una tarifa la excluye de los ajustes globales.
+Al publicar una nueva versión, cambia CACHE ("beautypod-ai-v4") en sw.js.
