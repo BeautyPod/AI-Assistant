@@ -1,5 +1,5 @@
-const CACHE="beautypod-ai-v6";
-const CORE=["./","./index.html","./manifest.json","./icons/icon-192.png","./icons/icon-512.png","./img/una-encarnada.jpg","./img/verrugas.jpg","./img/mal-olor.jpg","./img/callosidades.jpg"];
+const CACHE="beautypod-ai-v8";
+const CORE=["./","./index.html","./manifest.json","./icons/icon-192.png","./icons/icon-512.png","./img/una-encarnada.jpg","./img/verrugas.jpg","./img/mal-olor.jpg","./img/callosidades.jpg","./img/onicomicosis.jpg"];
 const OPTIONAL=["./assets/img/beautypod-logo.svg"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(async c=>{await c.addAll(CORE);await Promise.all(OPTIONAL.map(u=>c.add(u).catch(()=>{})));self.skipWaiting()}))});
 self.addEventListener("message",e=>{if(e.data==="SKIP_WAITING")self.skipWaiting()});
