@@ -11,7 +11,7 @@
 <style>
 :root{--bg:#1c1c1c;--surface:#272727;--surface2:#333;--border:rgba(255,255,255,.08);--text:#f2f2f2;--muted:#a3a3a3;--soft:#d4d4d4;--accent:#60a5fa;--accent-h:#93c5fd;--on-accent:#0b1220;--r:12px;--fh:Cardo,Georgia,serif;--fb:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 var(--fb);min-height:100vh;display:flex;flex-direction:column}
+html{font-size:14px}body{margin:0;background:var(--bg);color:var(--text);font:1rem/1.55 var(--fb);min-height:100vh;display:flex;flex-direction:column}
 button{font:inherit;cursor:pointer}a{color:inherit}
 h1,h2,h3{font-family:var(--fh);font-weight:700;line-height:1.2;margin:0}
 .wrap{width:100%;max-width:960px;margin:0 auto;padding:0 16px}
@@ -56,12 +56,19 @@ button.card{cursor:pointer}button.card:hover,button.card:focus-visible{border-co
 .photo{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;display:block}
 .g4{grid-template-columns:repeat(2,1fr)}.noimg{width:100%;aspect-ratio:16/9;border-radius:10px;background:var(--surface2)}@media(min-width:760px){.g4{grid-template-columns:repeat(3,1fr)}}
 .hero-img{max-width:420px;margin-bottom:14px}
-.banner{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:50;background:var(--surface2);border:1px solid var(--accent);border-radius:var(--r);padding:12px 14px;display:flex;gap:12px;align-items:center;justify-content:space-between;max-width:520px;margin:auto}
-.banner .btn{min-height:38px;padding:0 14px}
 .off{background:var(--surface2);color:var(--soft);text-align:center;font-size:.85rem;padding:6px 12px}
-footer{border-top:1px solid var(--border);background:#1a1a1a;padding:28px 0 calc(28px + env(safe-area-inset-bottom))}
-footer .brand{margin-bottom:10px}footer p{margin:4px 0;color:var(--muted);font-size:.9rem}
-footer nav{display:flex;flex-wrap:wrap;gap:8px 18px;margin:14px 0}footer nav a{color:var(--soft);font-size:.9rem;text-decoration:none}footer nav a:hover{color:var(--accent-h)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.site-footer{border-top:1px solid var(--border);background:#1a1a1a;padding:28px 0 calc(28px + env(safe-area-inset-bottom))}
+.footer-inner{display:grid;gap:18px}
+.footer-brand .logo{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-family:var(--fh);font-size:1.3rem;font-weight:700}
+#logo2{display:block;width:42px;height:42px;flex:0 0 42px}#logo2 img,#logo2 svg{display:block;width:42px;height:42px;object-fit:contain}
+.footer-brand p{margin:0;color:var(--muted);font-size:.9rem}
+.footer-address{font-style:normal;color:var(--muted);font-size:.9rem;line-height:1.8}
+.footer-address a{color:var(--accent);text-decoration:none}.footer-address a:hover{color:var(--accent-h)}
+.footer-social{display:flex;gap:10px}
+.social-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--soft)}
+.social-icon:hover{color:var(--accent-h);border-color:var(--accent)}
+.footer-copy{margin:0;color:var(--muted);font-size:.8rem}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media(min-width:700px){h1{font-size:2.2rem}.panel{padding:28px}}
 </style>
@@ -76,22 +83,27 @@ footer nav{display:flex;flex-wrap:wrap;gap:8px 18px;margin:14px 0}footer nav a{c
   <a class="weblink" href="https://beautypod.github.io/Web/" target="_blank" rel="noopener">Ir a la página web</a>
 </div></header>
 <main><div class="wrap" id="app" aria-live="polite"></div></main>
-<footer><div class="wrap">
-  <div class="brand"><span id="logo2"></span><b style="font-family:var(--fh);font-size:1.2rem">BeautyPod</b></div>
-  <p>Podología y cuidado de pies en Matanzas, Cuba</p>
-  <p>Calle 298 y Calle 131, Pueblo Nuevo, Matanzas, Cuba</p>
-  <nav>
-    <a href="https://maps.app.goo.gl/Axdd4hyurDcGLANy8" target="_blank" rel="noopener">Google Maps</a>
-    <a href="sms:+5353719118">SMS</a>
-    <a href="https://www.facebook.com/bpodpedicure" target="_blank" rel="noopener">Facebook</a>
-    <a href="https://www.instagram.com/beautypodlinet?stkn=NXRxM3owdnd5Mzd5" target="_blank" rel="noopener">Instagram</a>
-    <a href="https://t.me/bpplinet" target="_blank" rel="noopener">Telegram</a>
-    <a href="https://wa.me/5353719118?text=%5BPW%5D%20Hola%2C%20quiero%20reservar%20una%20cita" target="_blank" rel="noopener">WhatsApp</a>
-    <a href="https://www.tripadvisor.com/Attraction_Review-g663510-d28549168-Reviews-Beautypod_Podologia_y_Pedicure-Matanzas_Matanzas_Province_Cuba.html" target="_blank" rel="noopener">Tripadvisor</a>
-  </nav>
-  <p>© <span id="yr"></span> BeautyPod. Todos los derechos reservados.</p>
-</div></footer>
-<div id="upd" class="banner" hidden><span>Hay una nueva versión disponible.</span><button class="btn" id="updBtn">Actualizar</button></div>
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <p class="logo"><span id="logo2"></span><span>BeautyPod</span></p>
+      <p>Podología y cuidado de pies en Matanzas, Cuba.</p>
+    </div>
+    <address class="footer-address">
+      Calle 298 y Calle 131, Pueblo Nuevo, Matanzas, Cuba<br>
+      <a href="https://maps.app.goo.gl/Axdd4hyurDcGLANy8" target="_blank" rel="noopener noreferrer">Ver ubicación en Google Maps<span class="sr-only"> (se abre en una pestaña nueva)</span></a><br>
+      <a href="sms:+5353719118">SMS: +53 5371 9118</a>
+    </address>
+    <nav class="footer-social" aria-label="Redes sociales y reseñas de BeautyPod">
+      <a class="social-icon" href="https://www.facebook.com/bpodpedicure" target="_blank" rel="noopener noreferrer" aria-label="BeautyPod en Facebook (se abre en una pestaña nueva)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M15 8.5h1.7V5.6c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.3H7.3V15h2.7v8h3.1v-8h2.6l1.4-2.9h-3v-2c0-.8.2-1.6 1.9-1.6Z"/></svg></a>
+      <a class="social-icon" href="https://www.instagram.com/beautypodlinet?stkn=NXRxM3owdnd5Mzd5" target="_blank" rel="noopener noreferrer" aria-label="BeautyPod en Instagram (se abre en una pestaña nueva)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor"/></svg></a>
+      <a class="social-icon" href="https://t.me/bpplinet" target="_blank" rel="noopener noreferrer" aria-label="BeautyPod en Telegram (se abre en una pestaña nueva)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M9.78 18.65c-.4 0-.33-.15-.47-.53l-1.18-3.87 9-5.35c.4-.24.06-.35-.22-.14l-11.1 6.98-1.9-.6c-.44-.14-.44-.43.09-.65l16.4-6.32c.36-.16.71.09.57.66l-2.79 13.14c-.2.9-.75 1.11-1.51.71l-4.16-3.07-2 1.93c-.23.23-.42.42-.73.42Z"/></svg></a>
+      <a class="social-icon" href="https://wa.me/5353719118?text=%5BPW%5D%20Hola%2C%20quiero%20reservar%20una%20cita" target="_blank" rel="noopener noreferrer" aria-label="BeautyPod en WhatsApp (se abre en una pestaña nueva)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2.5a9.5 9.5 0 0 0-8.2 14.3L2.5 21l4.3-1.3A9.5 9.5 0 1 0 12 2.5Zm5.4 13.6c-.24.66-1.2 1.24-1.86 1.34-.5.08-1.1.11-1.78-.1-.4-.13-.93-.3-1.6-.6-2.8-1.2-4.63-4.06-4.77-4.25-.14-.19-1.14-1.52-1.14-2.9 0-1.37.72-2.05.97-2.33.26-.28.57-.35.76-.35h.55c.17 0 .4-.07.63.48.24.56.8 1.96.88 2.1.08.15.13.32.03.51-.1.19-.15.31-.28.47-.14.17-.3.38-.42.52-.14.16-.29.32-.13.6.17.29.75 1.19 1.6 1.93 1.1.94 2 1.22 2.3 1.36.29.14.46.12.63-.08.17-.19.71-.82.9-1.1.19-.28.37-.24.64-.14.27.1 1.68.79 1.97.93.29.14.48.21.55.33.07.12.07.68-.16 1.33Z"/></svg></a>
+      <a class="social-icon" href="https://www.tripadvisor.com/Attraction_Review-g663510-d28549168-Reviews-Beautypod_Podologia_y_Pedicura-Matanzas_Matanzas_Province_Cuba.html" target="_blank" rel="noopener noreferrer" aria-label="BeautyPod en Tripadvisor (se abre en una pestaña nueva)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M2.4 9.6C5 7 8.3 5.8 12 5.8s7 1.2 9.6 3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="7.6" cy="14" r="3.8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="16.4" cy="14" r="3.8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="7.6" cy="14" r="1.4" fill="currentColor"/><circle cx="16.4" cy="14" r="1.4" fill="currentColor"/><path d="M12 14.2l-1.3 1.9h2.6z" fill="currentColor"/></svg></a>
+    </nav>
+    <p class="footer-copy">© <span id="yr"></span> BeautyPod. Todos los derechos reservados.</p>
+  </div>
+</footer>
 
 <script>
 /* ============ 1. CONFIGURACIÓN GENERAL ============ */
@@ -327,14 +339,7 @@ window.addEventListener("hashchange",route);
 window.addEventListener("beforeinstallprompt",e=>e.preventDefault()); // sin aviso de instalación
 const off=document.getElementById("off");
 const net=()=>{off.hidden=navigator.onLine}; window.addEventListener("online",net); window.addEventListener("offline",net); net();
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("./sw.js").then(reg=>{
-    const show=w=>{document.getElementById("upd").hidden=false;document.getElementById("updBtn").onclick=()=>w.postMessage("SKIP_WAITING")};
-    if(reg.waiting&&navigator.serviceWorker.controller) show(reg.waiting);
-    reg.addEventListener("updatefound",()=>{const w=reg.installing; w.addEventListener("statechange",()=>{if(w.state==="installed"&&navigator.serviceWorker.controller) show(w)})});
-  }).catch(()=>{});
-  let r=false; navigator.serviceWorker.addEventListener("controllerchange",()=>{if(r)return;r=true;location.reload()});
-}
+if("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(()=>{});
 document.getElementById("yr").textContent=new Date().getFullYear();
 logo(document.getElementById("logo")); logo(document.getElementById("logo2"));
 route();
