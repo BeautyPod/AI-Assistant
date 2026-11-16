@@ -73,6 +73,9 @@ button.card{cursor:pointer}button.card:hover,button.card:focus-visible{border-co
 .social-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--soft)}
 .social-icon:hover{color:var(--accent-h);border-color:var(--accent)}
 .footer-copy{margin:0;color:var(--muted);font-size:.8rem}
+.card,.opt{border-color:rgba(96,165,250,.38);box-shadow:0 0 12px rgba(96,165,250,.22),inset 0 0 0 1px rgba(96,165,250,.08)}
+.opt{border-width:1px}.opt[aria-checked=true]{border-width:1px;border-color:var(--accent);box-shadow:0 0 16px rgba(96,165,250,.45),inset 0 0 0 1px var(--accent)}
+button.card:hover,button.card:focus-visible{border-color:var(--accent-h);box-shadow:0 0 18px rgba(96,165,250,.4)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media(min-width:700px){h1{font-size:2.2rem}.panel{padding:28px}}
 </style>
@@ -80,7 +83,7 @@ button.card{cursor:pointer}button.card:hover,button.card:focus-visible{border-co
 <body>
 <div id="off" class="off" hidden>Sin conexión. Podrás seguir seleccionando; WhatsApp requiere conexión para completar el envío.</div>
 <header><div class="wrap">
-  <a class="brand" href="#/home" aria-label="BeautyPod AI Assistant">
+  <a class="brand" href="#/perfil" aria-label="BeautyPod AI Assistant">
     <span id="logo"></span>
     <span><b>BeautyPod</b><small>AI Assistant</small></span>
   </a>
@@ -118,7 +121,7 @@ const WHATSAPP_NUM = "5353719118";
    ajuste:false → excluida de los ajustes globales */
 const REFERENCIA_ORIGINAL = { id:"sano", precioCUP:1500, usd:3, tasa:500 };
 const TARIFAS = {
-  corte:{base:500}, micoticas:{base:[800,1000]}, sano:{base:1500}, micotico:{base:null},
+  corte:{base:500}, micoticas:{base:[800,1000]}, sano:{base:1500}, micotico:{base:null}, micosisTrat:{base:1000},
   grietas:{base:[2000,2500]}, micoGrietas:{base:[2500,3000]},
   esmalte:{base:500}, masaje5:{base:450}, masaje10:{base:700},
   cuppingPies:{base:null}, cuppingPantPies:{base:null}, aparato:{base:null}, aparatoCupping:{base:null},
@@ -150,7 +153,10 @@ const CAMBIOS_ESPECIFICOS = {
 const ESMALTE_HABILITADO = { corte:true, micoticas:false, sano:true, micotico:false, grietas:true, micoGrietas:false };
 // Otros adicionales: sin matriz definida → se ofrecen en todos los servicios (pendiente de confirmar).
 const ADICIONAL_NO_COMPATIBLE = {}; // ej.: { parafina:["micoticas"] }
+const SIN_PRECIO = ["tratOni"]; // opciones sin precio: no suman ni bloquean el total
+const TRAT_ONI_HABILITADO = { micoticas:true, micotico:true };
 function adicionalCompatible(extraId, mainId){
+  if(extraId==="tratOni") return TRAT_ONI_HABILITADO[mainId]===true;
   if(extraId==="esmalte") return ESMALTE_HABILITADO[mainId]===true;
   return !(ADICIONAL_NO_COMPATIBLE[extraId]||[]).includes(mainId);
 }
@@ -158,6 +164,7 @@ function adicionalCompatible(extraId, mainId){
 /* ============ 6. CATÁLOGO ============ */
 const SERVICIOS = [
   {id:"corte",n:"Corte de uñas sanas",d:"Corte anatómico preventivo para ayudar a evitar uñas encarnadas."},
+  {id:"micosisTrat",n:"Servicio de uñas con micosis en tratamiento",d:"",soloHabitual:true},
   {id:"micoticas",n:"Servicio de uñas micóticas",d:"Servicio de limpieza y desbaste profesional para uñas con onicomicosis."},
   {id:"sano",n:"Servicio Preventivo Completo (Sano)",d:"Servicio de limpieza completa de uñas y plantas; incluye resequedad y descamación de la zona plantar."},
   {id:"micotico",n:"Servicio Preventivo Completo (Micótico)",d:"Servicio de limpieza completa con onicomicosis."},
@@ -168,7 +175,8 @@ const ADICIONALES = [
   {id:"esmalte",n:"Esmalte"},{id:"masaje5",n:"Masaje manual de 5 minutos"},{id:"masaje10",n:"Masaje manual de 10 minutos"},
   {id:"cuppingPies",n:"Cupping en pies"},{id:"cuppingPantPies",n:"Cupping en pantorrillas y pies"},
   {id:"aparato",n:"Masaje aparatológico"},{id:"aparatoCupping",n:"Masaje aparatológico combinado con cupping"},
-  {id:"electro",n:"Electroestimulación"},{id:"parafina",n:"Parafina"},{id:"cosmetica",n:"Cosmética asistida con ultrasonido o LED"}
+  {id:"electro",n:"Electroestimulación"},{id:"parafina",n:"Parafina"},{id:"cosmetica",n:"Cosmética asistida con ultrasonido o LED"},
+  {id:"tratOni",n:"Quiero comenzar tratamiento de onicomicosis"}
 ];
 /* TEXTOS PENDIENTES DE VALIDACIÓN por la especialista (redacción provisional, informativa, sin diagnóstico) */
 const PROBLEMAS = [
@@ -223,7 +231,7 @@ function precio(id){
 }
 function total(ids){
   let mn=0,mx=0;
-  for(const id of ids){const p=precio(id); if(p.pending) return {pending:true}; mn+=p.min; mx+=p.max;}
+  for(const id of ids){ if(SIN_PRECIO.includes(id)) continue;const p=precio(id); if(p.pending) return {pending:true}; mn+=p.min; mx+=p.max;}
   return {min:mn,max:mx};
 }
 const num = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g,".");
@@ -232,22 +240,24 @@ const fmtOP = p => fmt(p) || '<span class="pend">Precio pendiente de confirmaci�
 const fmtTxt = p => fmt(p) || "Precio pendiente de confirmación";
 
 /* ============ 8. ESTADO ============ */
-let S={main:null,extras:[],none:false,nivel:{},locked:false,area:"limpiezas"};
+let S={main:null,extras:[],none:false,nivel:{},locked:false,area:"limpiezas",perfil:null};
 try{ S=Object.assign(S,JSON.parse(sessionStorage.getItem("bp_sel")||"{}")); }catch(e){}
 const save=()=>{try{sessionStorage.setItem("bp_sel",JSON.stringify(S))}catch(e){}};
 const extrasValidos=()=>S.extras.filter(e=>adicionalCompatible(e,S.main));
+const serviciosVisibles=()=>SERVICIOS.filter(s=>!s.soloHabitual||S.perfil==="habitual");
 const svc=id=>SERVICIOS.find(s=>s.id===id);
 const ext=id=>ADICIONALES.find(s=>s.id===id);
 
 /* ============ 9. WHATSAPP ============ */
 function abrirWA(texto){
+  if(S.perfil==="habitual") texto=texto.replace("Hola, BeautyPod.","Hola, BeautyPod. Soy cliente habitual.");
   if(!navigator.onLine){alert("WhatsApp requiere conexión a internet. Cuando vuelvas a tener conexión, podrás completar el envío.");return;}
   window.open("https://wa.me/"+WHATSAPP_NUM+"?text="+encodeURIComponent(texto),"_blank","noopener");
 }
 function textoVoucher(){
   const ex=extrasValidos(), tot=total([S.main,...ex]);
   let t="Hola, BeautyPod. Esta es mi elección:\n\nServicio: "+svc(S.main).n+" ("+fmtTxt(precio(S.main))+")\n\nAdicionales:\n";
-  t+= ex.length? ex.map(e=>"- "+ext(e).n+" ("+fmtTxt(precio(e))+")").join("\n") : "- Ninguno";
+  t+= ex.length? ex.map(e=>"- "+ext(e).n+(SIN_PRECIO.includes(e)?"":" ("+fmtTxt(precio(e))+")")).join("\n") : "- Ninguno";
   t+="\n\nTotal: "+(tot.pending?"pendiente de confirmación":fmt(tot));
   t+="\n\nQuisiera coordinar una cita.";
   return t;
@@ -260,21 +270,28 @@ function logo(el){
   i.onload=()=>{el.innerHTML="";el.appendChild(i)}; i.onerror=()=>{};
   el.innerHTML=robot; i.src="assets/img/beautypod-logo.svg";
 }
-const back=(to,label="Volver")=>(to==="home"&&S.locked)?"":`<button class="back" data-go="${to}">← ${label}</button>`;
+const back=(to,label="Volver")=>((to==="home"||to==="perfil")&&S.locked)?"":`<button class="back" data-go="${to}">← ${label}</button>`;
 
 const V={
-home(){return `
-<div class="panel"><h1>¿Qué servicio buscas?</h1><p class="lead">Selecciona el tipo de atención que necesitas.</p>
+perfil(){return `
+<div class="panel"><h1>Bienvenido a BeautyPod</h1><p class="lead">Selecciona una opción.</p>
 <div class="grid g2">
- <div class="card big"><h3>Limpiezas y cuidados podológicos</h3><p>Para el cuidado de uñas, plantas y piel de tus pies.</p><button class="btn" data-go="limpiezas">Entrar →</button></div>
- <div class="card big"><h3>Tratamientos podológicos localizados</h3><p>Para problemas específicos que requieren atención localizada.</p><button class="btn" data-go="locales">Entrar →</button></div>
+ <div class="card big"><h3>Cliente nuevo</h3><p>Conoce nuestros servicios y elige el que necesitas.</p><button class="btn" data-perfil="nuevo">Entrar →</button></div>
+ <div class="card big"><h3>Cliente habitual</h3><p>Ve directo a tu servicio.</p><button class="btn" data-perfil="habitual">Entrar →</button></div>
 </div></div>`},
 
-limpiezas(){return back("home")+`
-<div class="panel compact"><p class="eyebrow">Limpiezas y cuidados podológicos</p><h1>¿Qué problema deseas atender?</h1>
-<p class="lead">Selecciona el servicio que necesitas.</p>
-<div class="stack sm">${SERVICIOS.map(s=>`<button class="card" data-main="${s.id}"><h3>${s.n}</h3><p>${s.d}</p><span class="go">Seleccionar →</span></button>`).join("")}
-<div class="card info"><h3>Quiero conocer los tratamientos para la onicomicosis</h3><p>Conversa con la asistente por WhatsApp para recibir información sobre las alternativas y cómo acceder a una valoración profesional.</p><button class="btn ghost" data-oni>Consultar por WhatsApp</button></div>
+home(){const hab=S.perfil==="habitual";return back("perfil")+`
+<div class="panel">${hab?'<h1>Bienvenido de nuevo</h1><p class="lead">Elige lo que necesitas hoy.</p>':'<h1>¿Qué servicio buscas?</h1><p class="lead">Selecciona el tipo de atención que necesitas.</p>'}
+<div class="grid g2">
+ <div class="card big"><h3>Limpiezas y cuidados podológicos</h3>${hab?"":"<p>Para el cuidado de uñas, plantas y piel de tus pies.</p>"}<button class="btn" data-go="limpiezas">Entrar →</button></div>
+ <div class="card big"><h3>Tratamientos podológicos localizados</h3>${hab?"":"<p>Para problemas específicos que requieren atención localizada.</p>"}<button class="btn" data-go="locales">Entrar →</button></div>
+</div></div>`},
+
+limpiezas(){const hab=S.perfil==="habitual";return back("home")+`
+<div class="panel compact"><p class="eyebrow">Limpiezas y cuidados podológicos</p><h1>${hab?"¿Qué necesitas hoy?":"¿Qué problema deseas atender?"}</h1>
+${hab?"":'<p class="lead">Selecciona el servicio que necesitas.</p>'}
+<div class="stack sm">${serviciosVisibles().map(s=>`<button class="card" data-main="${s.id}"><h3>${s.n}</h3>${hab?"":`<p>${s.d}</p>`}<span class="go">Seleccionar →</span></button>`).join("")}
+
 </div></div>`},
 
 extras(){
@@ -282,7 +299,7 @@ extras(){
   const ids=[m,...ex], tot=total(ids), ready=ex.length>0||S.none;
   return back("limpiezas")+`
 <div class="panel compact"><p class="eyebrow">Personaliza tu servicio</p><h1>¿Deseas agregar algo más?</h1>
-<div class="main-box"><b class="mname">${svc(m).n}</b><p>${svc(m).d}</p><div class="price" style="${precio(m).pending?'font-size:1rem':''}">${fmtOP(precio(m))}</div></div>
+<div class="main-box"><b class="mname">${svc(m).n}</b>${svc(m).d?`<p>${svc(m).d}</p>`:""}<div class="price" style="${precio(m).pending?'font-size:1rem':''}">${fmtOP(precio(m))}</div></div>
 <h2 style="font-size:1.05rem">Servicios adicionales</h2><p class="note" style="font-size:.78rem">Puedes elegir los que desees.</p>
 <div class="stack sm" role="group">${items.map(a=>`<button class="opt" role="checkbox" aria-checked="${ex.includes(a.id)}" data-extra="${a.id}"><span><b>${a.n}</b></span><span class="dot"></span></button>`).join("")}
 <button class="opt" role="checkbox" aria-checked="${S.none}" data-none><span><b>No deseo ningún servicio adicional</b></span><span class="dot"></span></button></div>
@@ -302,7 +319,7 @@ voucher(){
 <div class="sum"><p class="eyebrow">Servicio principal</p>
 <div class="row"><span>${svc(m).n}</span><span>${fmtOP(precio(m))}</span></div>
 <p class="eyebrow" style="margin-top:14px">Adicionales</p>
-${ex.length?ex.map(e=>`<div class="row"><span>${ext(e).n}</span><span>${fmtOP(precio(e))}</span></div>`).join(""):'<div class="row"><span>Ninguno</span><span></span></div>'}
+${ex.length?ex.map(e=>`<div class="row"><span>${ext(e).n}</span><span>${SIN_PRECIO.includes(e)?"":fmtOP(precio(e))}</span></div>`).join(""):'<div class="row"><span>Ninguno</span><span></span></div>'}
 <div class="row t"><span>Total</span><span>${tot.pending?'<span class="pend" style="font-size:.85rem">Pendiente de confirmación</span>':fmt(tot)}</span></div></div>
 ${(tot.pending||rango)?'<p class="note">El importe puede variar según la valoración profesional.</p>':''}
 <p class="note">Este voucher es un resumen de tu selección. La cita no queda confirmada hasta que BeautyPod responda tu mensaje.</p>
@@ -328,36 +345,39 @@ ${sel?`<div class="main-box"><p>Precio para «${nivSel[1]}»</p><div class="pric
 :(pr.pending?"":`<div class="main-box"><p>Rango de precio informativo</p><div class="price">${fmt(pr)}</div><p style="margin:8px 0 0">El precio depende del diagnóstico realizado por la especialista.</p></div>`)}
 <p class="note"><b style="color:var(--soft)">Formas de pago:</b> efectivo o transferencia por Transfermóvil.</p>
 <p class="note" style="margin-top:0">Si deseas más detalles, puedes hablar con la asistente por WhatsApp.</p>
-<button class="btn full" data-wa-prob="${p.id}">Enviar mi decisión a la asistente</button>
+<button class="btn full" data-wa-prob="${p.id}">${p.id==="onicomicosis"?"Diagnóstico y solicitud de tratamiento":"Enviar mi decisión a la asistente"}</button>
 <button class="btn ghost full" style="margin-top:10px" data-wa-hablar="${p.id}">Deseo mejor hablar con la asistente</button></div>`}
 };
 
 /* ============ 11. NAVEGACIÓN ============ */
 function route(){
-  const [v,arg]=(location.hash.replace(/^#\/?/,"")||"home").split("/");
-  let view=V[v]?v:"home";
+  const [v,arg]=(location.hash.replace(/^#\/?/,"")||"perfil").split("/");
+  let view=V[v]?v:"perfil";
+  if(!S.perfil) view="perfil";
+  if(view==="perfil"&&S.perfil&&S.locked) view="home";
   if((view==="extras"||view==="voucher")&&!svc(S.main)) view="limpiezas";
-  // Tras pasar 2 pantallas (tercera en adelante) ya no se puede volver a la primera
+  // Tras pasar 2 pantallas (extras / tratamiento) ya no se puede volver a las primeras
   if(["extras","voucher","problema"].includes(view)){ S.locked=true; S.area=view==="problema"?"locales":"limpiezas"; save(); }
   else if(view==="limpiezas"||view==="locales"){ S.area=view; save(); }
   if(view==="home"&&S.locked){ location.replace("#/"+S.area); return; }
-  const lg=document.querySelector("header .brand"); if(lg) lg.setAttribute("href","#/"+(S.locked?S.area:"home"));
+  const lg=document.querySelector("header .brand"); if(lg) lg.setAttribute("href","#/"+(S.locked?S.area:(S.perfil?"home":"perfil")));
   document.getElementById("app").innerHTML=V[view](arg);
   window.scrollTo(0,0);
 }
 const go=p=>{location.hash="#/"+p};
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-go],[data-main],[data-extra],[data-none],[data-prob],[data-nivel],[data-oni],[data-wa-voucher],[data-wa-prob],[data-wa-hablar]"); if(!t) return;
+  const t=e.target.closest("[data-go],[data-perfil],[data-main],[data-extra],[data-none],[data-prob],[data-nivel],[data-wa-voucher],[data-wa-prob],[data-wa-hablar]"); if(!t) return;
   const d=t.dataset;
   if(d.go!==undefined) return go(d.go);
+  if(d.perfil){ S.perfil=d.perfil; if(d.perfil!=="habitual"&&svc(S.main)&&svc(S.main).soloHabitual){S.main=null;S.extras=[];S.none=false;} save(); return go("home"); }
   if(d.main){ if(S.main!==d.main){S.extras=S.extras.filter(x=>adicionalCompatible(x,d.main));} S.main=d.main; save(); return go("extras"); }
   if(d.extra){ S.none=false; S.extras=S.extras.includes(d.extra)?S.extras.filter(x=>x!==d.extra):[...S.extras,d.extra]; save(); return route(); }
   if(d.none!==undefined){ S.none=!S.none; if(S.none) S.extras=[]; save(); return route(); }
   if(d.prob) return go("problema/"+d.prob);
   if(d.nivel){ const [pid,lid]=d.nivel.split("|"); S.nivel=S.nivel||{}; if(S.nivel[pid]===lid) delete S.nivel[pid]; else S.nivel[pid]=lid; save(); return route(); }
-  if(d.oni!==undefined) return abrirWA("Hola, BeautyPod. Quisiera conocer los tratamientos disponibles para la onicomicosis y recibir información sobre cómo puedo acceder a una valoración.");
   if(d.waHablar){ let q; if(d.waHablar==="v") q=svc(S.main).n; else q=PROBLEMAS.find(x=>x.id===d.waHablar).n; return abrirWA("Hola, BeautyPod. Prefiero hablar con la asistente antes de decidir. Me interesa: "+q+"."); }
   if(d.waVoucher!==undefined) return abrirWA(textoVoucher());
+  if(d.waProb==="onicomicosis") return abrirWA("Hola, BeautyPod. Quisiera un diagnóstico y solicitar tratamiento para la onicomicosis. Me gustaría coordinar una cita.");
   if(d.waProb){ const p=PROBLEMAS.find(x=>x.id===d.waProb), l=(p.niveles||[]).find(x=>x[0]===(S.nivel||{})[p.id]); return abrirWA("Hola, BeautyPod. Creo que tengo "+p.n.toLowerCase()+(l?" ("+l[1]+")":"")+" y quisiera recibir atención. Me gustaría coordinar una cita."); }
 });
 window.addEventListener("hashchange",route);
