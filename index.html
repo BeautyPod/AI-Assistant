@@ -47,6 +47,9 @@ button.card{cursor:pointer}button.card:hover,button.card:focus-visible{border-co
 .stack{display:grid;gap:10px}
 .price{color:var(--accent);font-family:var(--fh);font-size:1.7rem;font-weight:700}
 .main-box{background:var(--surface2);border-radius:var(--r);padding:16px;margin:16px 0}
+.mname{font-family:var(--fh);font-size:1.15rem}
+.compact .card h3{font-size:.95rem}.compact .card p{font-size:.78rem}.compact .go{font-size:.78rem}.compact .card .btn{font-size:.85rem;min-height:40px}
+.compact .opt b{font-size:.85rem;font-weight:600}.compact .mname{font-size:.95rem}.compact .main-box p{font-size:.78rem}.compact h2{font-size:1.1rem}.compact .note{font-size:.78rem}
 .main-box p{margin:2px 0 8px;color:var(--muted);font-size:.9rem}
 .sum{background:var(--surface2);border-radius:var(--r);padding:16px;margin:16px 0}
 .row{display:flex;justify-content:space-between;gap:12px;padding:6px 0}.row span:last-child{text-align:right;font-weight:600}
@@ -54,7 +57,8 @@ button.card{cursor:pointer}button.card:hover,button.card:focus-visible{border-co
 .note{color:var(--muted);font-size:.85rem;margin:10px 0}
 .pend{color:var(--muted);font-style:italic;font-weight:400}
 .photo{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;display:block}
-.g4{grid-template-columns:repeat(2,1fr)}.noimg{width:100%;aspect-ratio:16/9;border-radius:10px;background:var(--surface2)}@media(min-width:760px){.g4{grid-template-columns:repeat(3,1fr)}}
+.g4{grid-template-columns:repeat(2,1fr)}.sm .card h3{font-size:.95rem}.sm .card p{font-size:.78rem}.sm .go{font-size:.78rem}.sm .btn{min-height:40px;font-size:.85rem}.sm .card{padding:14px}.sm .opt{min-height:46px;padding:10px 14px}.sm .opt b{font-size:.85rem}.sm .opt small{font-size:.72rem}
+.noimg{width:100%;aspect-ratio:16/9;border-radius:10px;background:var(--surface2)}@media(min-width:760px){.g4{grid-template-columns:repeat(3,1fr)}}
 .hero-img{max-width:420px;margin-bottom:14px}
 .off{background:var(--surface2);color:var(--soft);text-align:center;font-size:.85rem;padding:6px 12px}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
@@ -267,9 +271,9 @@ home(){return `
 </div></div>`},
 
 limpiezas(){return back("home")+`
-<div class="panel"><p class="eyebrow">Limpiezas y cuidados podológicos</p><h1>¿Qué problema deseas atender?</h1>
+<div class="panel compact"><p class="eyebrow">Limpiezas y cuidados podológicos</p><h1>¿Qué problema deseas atender?</h1>
 <p class="lead">Selecciona el servicio que necesitas.</p>
-<div class="stack">${SERVICIOS.map(s=>`<button class="card" data-main="${s.id}"><h3>${s.n}</h3><p>${s.d}</p><span class="go">Seleccionar →</span></button>`).join("")}
+<div class="stack sm">${SERVICIOS.map(s=>`<button class="card" data-main="${s.id}"><h3>${s.n}</h3><p>${s.d}</p><span class="go">Seleccionar →</span></button>`).join("")}
 <div class="card info"><h3>Quiero conocer los tratamientos para la onicomicosis</h3><p>Conversa con la asistente por WhatsApp para recibir información sobre las alternativas y cómo acceder a una valoración profesional.</p><button class="btn ghost" data-oni>Consultar por WhatsApp</button></div>
 </div></div>`},
 
@@ -277,10 +281,10 @@ extras(){
   const m=S.main, items=ADICIONALES.filter(a=>adicionalCompatible(a.id,m)), ex=extrasValidos();
   const ids=[m,...ex], tot=total(ids), ready=ex.length>0||S.none;
   return back("limpiezas")+`
-<div class="panel"><p class="eyebrow">Personaliza tu servicio</p><h1>¿Deseas agregar algo más?</h1>
-<div class="main-box"><b style="font-family:var(--fh);font-size:1.15rem">${svc(m).n}</b><p>${svc(m).d}</p><div class="price" style="${precio(m).pending?'font-size:1rem':''}">${fmtOP(precio(m))}</div></div>
-<h2>Servicios adicionales</h2><p class="note">Puedes elegir los que desees.</p>
-<div class="stack" role="group">${items.map(a=>`<button class="opt" role="checkbox" aria-checked="${ex.includes(a.id)}" data-extra="${a.id}"><span><b>${a.n}</b></span><span class="dot"></span></button>`).join("")}
+<div class="panel compact"><p class="eyebrow">Personaliza tu servicio</p><h1>¿Deseas agregar algo más?</h1>
+<div class="main-box"><b class="mname">${svc(m).n}</b><p>${svc(m).d}</p><div class="price" style="${precio(m).pending?'font-size:1rem':''}">${fmtOP(precio(m))}</div></div>
+<h2 style="font-size:1.05rem">Servicios adicionales</h2><p class="note" style="font-size:.78rem">Puedes elegir los que desees.</p>
+<div class="stack sm" role="group">${items.map(a=>`<button class="opt" role="checkbox" aria-checked="${ex.includes(a.id)}" data-extra="${a.id}"><span><b>${a.n}</b></span><span class="dot"></span></button>`).join("")}
 <button class="opt" role="checkbox" aria-checked="${S.none}" data-none><span><b>No deseo ningún servicio adicional</b></span><span class="dot"></span></button></div>
 <div class="sum"><p class="eyebrow">Resumen de tu selección</p>
 <div class="row"><span>Servicio principal</span><span>${fmtOP(precio(m))}</span></div>
