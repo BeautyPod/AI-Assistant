@@ -302,6 +302,7 @@ ${ex.length?ex.map(e=>`<div class="row"><span>${ext(e).n}</span><span>${fmtOP(pr
 <div class="row t"><span>Total</span><span>${tot.pending?'<span class="pend" style="font-size:.85rem">Pendiente de confirmación</span>':fmt(tot)}</span></div></div>
 ${(tot.pending||rango)?'<p class="note">El importe puede variar según la valoración profesional.</p>':''}
 <p class="note">Este voucher es un resumen de tu selección. La cita no queda confirmada hasta que BeautyPod responda tu mensaje.</p>
+<p class="note"><b style="color:var(--soft)">Formas de pago:</b> efectivo o transferencia por Transfermóvil.</p>
 <button class="btn full" data-wa-voucher>Enviar mi decisión a la asistente</button>
 <button class="btn ghost full" style="margin-top:10px" data-wa-hablar="v">Deseo mejor hablar con la asistente</button></div>`},
 
@@ -321,6 +322,7 @@ ${niv.length?`<h2 style="margin:6px 0 4px">¿Cómo se encuentra?</h2><p class="n
 <div class="stack" role="radiogroup">${niv.map(([lid,n,d])=>`<button class="opt" role="radio" aria-checked="${sel===lid}" data-nivel="${p.id}|${lid}"><span><b>${n}</b><small>${d}</small></span><span class="dot"></span></button>`).join("")}</div>
 ${sel?`<div class="main-box"><p>Precio para «${nivSel[1]}»</p><div class="price">${fmtOP(precio(sel))}</div><p style="margin:8px 0 0">El precio depende del diagnóstico realizado por la especialista.</p></div>`:""}`
 :(pr.pending?"":`<div class="main-box"><p>Rango de precio informativo</p><div class="price">${fmt(pr)}</div><p style="margin:8px 0 0">El precio depende del diagnóstico realizado por la especialista.</p></div>`)}
+<p class="note"><b style="color:var(--soft)">Formas de pago:</b> efectivo o transferencia por Transfermóvil.</p>
 <p class="note" style="margin-top:0">Si deseas más detalles, puedes hablar con la asistente por WhatsApp.</p>
 <button class="btn full" data-wa-prob="${p.id}">Enviar mi decisión a la asistente</button>
 <button class="btn ghost full" style="margin-top:10px" data-wa-hablar="${p.id}">Deseo mejor hablar con la asistente</button></div>`}
