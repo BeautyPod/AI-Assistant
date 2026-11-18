@@ -6,7 +6,8 @@
 <meta name="theme-color" content="#1c1c1c">
 <meta name="description" content="Asistente de servicios y consultas de BeautyPod, Matanzas, Cuba.">
 <link rel="manifest" href="./manifest.json">
-<link rel="icon" href="./icons/icon-192.png">
+<link rel="icon" href="./icons/icon-192.png?v=4">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=4">
 <title>AI Assistant | BeautyPod</title>
 <style>
 :root{--bg:#1c1c1c;--surface:#272727;--surface2:#333;--border:rgba(255,255,255,.08);--text:#f2f2f2;--muted:#a3a3a3;--soft:#d4d4d4;--accent:#60a5fa;--accent-h:#93c5fd;--on-accent:#0b1220;--r:12px;--fh:Cardo,Georgia,serif;--fb:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
@@ -49,7 +50,8 @@ button.card{cursor:pointer}button.card:hover,button.card:focus-visible{border-co
 .main-box{background:var(--surface2);border-radius:var(--r);padding:16px;margin:16px 0}
 .mname{font-family:var(--fh);font-size:1.15rem}
 .compact .card h3{font-size:.95rem}.compact .card p{font-size:.78rem}.compact .go{font-size:.78rem}.compact .card .btn{font-size:.85rem;min-height:40px}
-.compact .opt b{font-size:.85rem;font-weight:600}.compact .mname{font-size:.95rem}.compact .main-box p{font-size:.78rem}.compact h2{font-size:1.1rem}.compact .note{font-size:.78rem}
+.compact .opt b{font-size:.85rem;font-weight:600}.compact .mname{font-size:.95rem}.compact .sub{margin:-2px 0 4px 18px;padding-left:12px;border-left:2px solid rgba(96,165,250,.4)}
+.main-box p{font-size:.78rem}.compact h2{font-size:1.1rem}.compact .note{font-size:.78rem}
 .main-box p{margin:2px 0 8px;color:var(--muted);font-size:.9rem}
 .sum{background:var(--surface2);border-radius:var(--r);padding:16px;margin:16px 0}
 .row{display:flex;justify-content:space-between;gap:12px;padding:6px 0}.row span:last-child{text-align:right;font-weight:600}
@@ -76,6 +78,7 @@ button.card{cursor:pointer}button.card:hover,button.card:focus-visible{border-co
 .card,.opt{border-color:rgba(96,165,250,.38);box-shadow:0 0 12px rgba(96,165,250,.22),inset 0 0 0 1px rgba(96,165,250,.08)}
 .opt{border-width:1px}.opt[aria-checked=true]{border-width:1px;border-color:var(--accent);box-shadow:0 0 16px rgba(96,165,250,.45),inset 0 0 0 1px var(--accent)}
 button.card:hover,button.card:focus-visible{border-color:var(--accent-h);box-shadow:0 0 18px rgba(96,165,250,.4)}
+.compact .opt small{font-size:.72rem;line-height:1.35;margin-top:2px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 @media(min-width:700px){h1{font-size:2.2rem}.panel{padding:28px}}
 </style>
@@ -121,7 +124,8 @@ const WHATSAPP_NUM = "5353719118";
    ajuste:false → excluida de los ajustes globales */
 const REFERENCIA_ORIGINAL = { id:"sano", precioCUP:1500, usd:3, tasa:500 };
 const TARIFAS = {
-  corte:{base:500}, micoticas:{base:[800,1000]}, sano:{base:1500}, micotico:{base:null}, micosisTrat:{base:1000},
+  corte:{base:500}, micoticas:{base:[800,1000]}, sano:{base:1500}, micotico:{base:[2000,2500]}, micosisTrat:{base:1000},
+  tratOni_salon:{base:800}, tratOni_casa:{base:2500}, tratOni_pend:{base:null},
   grietas:{base:[2000,2500]}, micoGrietas:{base:[2500,3000]},
   esmalte:{base:500}, masaje5:{base:450}, masaje10:{base:700},
   cuppingPies:{base:null}, cuppingPantPies:{base:null}, aparato:{base:null}, aparatoCupping:{base:null},
@@ -153,8 +157,9 @@ const CAMBIOS_ESPECIFICOS = {
 const ESMALTE_HABILITADO = { corte:true, micoticas:false, sano:true, micotico:false, grietas:true, micoGrietas:false };
 // Otros adicionales: sin matriz definida → se ofrecen en todos los servicios (pendiente de confirmar).
 const ADICIONAL_NO_COMPATIBLE = {}; // ej.: { parafina:["micoticas"] }
-const SIN_PRECIO = ["tratOni"]; // opciones sin precio: no suman ni bloquean el total
-const TRAT_ONI_HABILITADO = { micoticas:true, micotico:true };
+// «Quiero comenzar tratamiento de onicomicosis»: el cliente elige dónde se aplica; sin elegir, queda a definir (total pendiente)
+const ONI_OPCIONES = [["salon","Aplicación en el salón","tratOni_salon"],["casa","Aplicación en casa (frasco)","tratOni_casa"]];
+const TRAT_ONI_HABILITADO = { micoticas:true, micotico:true, micoGrietas:true };
 function adicionalCompatible(extraId, mainId){
   if(extraId==="tratOni") return TRAT_ONI_HABILITADO[mainId]===true;
   if(extraId==="esmalte") return ESMALTE_HABILITADO[mainId]===true;
@@ -171,12 +176,18 @@ const SERVICIOS = [
   {id:"grietas",n:"Servicio Preventivo Completo (Grietas)",d:"Servicio de limpieza completa con fisuras y grietas."},
   {id:"micoGrietas",n:"Servicio Preventivo Completo (Micótico y Grietas)",d:"Servicio de limpieza completa con grietas y onicomicosis."}
 ];
-const ADICIONALES = [
-  {id:"esmalte",n:"Esmalte"},{id:"masaje5",n:"Masaje manual de 5 minutos"},{id:"masaje10",n:"Masaje manual de 10 minutos"},
-  {id:"cuppingPies",n:"Cupping en pies"},{id:"cuppingPantPies",n:"Cupping en pantorrillas y pies"},
-  {id:"aparato",n:"Masaje aparatológico"},{id:"aparatoCupping",n:"Masaje aparatológico combinado con cupping"},
-  {id:"electro",n:"Electroestimulación"},{id:"parafina",n:"Parafina"},{id:"cosmetica",n:"Cosmética asistida con ultrasonido o LED"},
-  {id:"tratOni",n:"Quiero comenzar tratamiento de onicomicosis"}
+const ADICIONALES = [ // d: descripción corta (basada en la web de BeautyPod)
+  {id:"esmalte",n:"Esmalte",d:"Servicio cosmético para uñas sanas, cuidando la integridad de la uña."},
+  {id:"masaje5",n:"Masaje manual de 5 minutos",d:"Masaje breve que relaja y alivia la sensación de cansancio y pesadez en los pies."},
+  {id:"masaje10",n:"Masaje manual de 10 minutos",d:"Masaje más prolongado que relaja y alivia la sensación de cansancio y pesadez en los pies."},
+  {id:"cuppingPies",n:"Cupping en pies",d:"Ventosas que estimulan los tejidos de la planta del pie; puede ayudar a relajar la tensión y mejorar la circulación local."},
+  {id:"cuppingPantPies",n:"Cupping en pantorrillas y pies",d:"Ventosas en pantorrillas y pies para ayudar a relajar la tensión y la pesadez."},
+  {id:"aparato",n:"Masaje aparatológico",d:"Masaje con equipos para relajar, revitalizar y ayudar a reducir la inflamación."},
+  {id:"aparatoCupping",n:"Masaje aparatológico combinado con cupping",d:"Combina el masaje con equipos y el cupping en una misma sesión."},
+  {id:"electro",n:"Electroestimulación",d:"Aparatología que favorece la penetración de activos hidratantes y reparadores en la piel."},
+  {id:"parafina",n:"Parafina",d:"Hidratación intensiva que deja la piel de los pies suave."},
+  {id:"cosmetica",n:"Cosmética asistida con ultrasonido o LED",d:"Hidratación asistida con ultrasonido o luz LED para favorecer la absorción de los activos."},
+  {id:"tratOni",n:"Quiero comenzar tratamiento de onicomicosis",d:"Tratamiento personalizado para uñas con hongos."}
 ];
 /* TEXTOS PENDIENTES DE VALIDACIÓN por la especialista (redacción provisional, informativa, sin diagnóstico) */
 const PROBLEMAS = [
@@ -231,7 +242,7 @@ function precio(id){
 }
 function total(ids){
   let mn=0,mx=0;
-  for(const id of ids){ if(SIN_PRECIO.includes(id)) continue;const p=precio(id); if(p.pending) return {pending:true}; mn+=p.min; mx+=p.max;}
+  for(const id of ids){ const p=precio(id); if(p.pending) return {pending:true}; mn+=p.min; mx+=p.max;}
   return {min:mn,max:mx};
 }
 const num = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g,".");
@@ -240,10 +251,12 @@ const fmtOP = p => fmt(p) || '<span class="pend">Precio pendiente de confirmaci�
 const fmtTxt = p => fmt(p) || "Precio pendiente de confirmación";
 
 /* ============ 8. ESTADO ============ */
-let S={main:null,extras:[],none:false,nivel:{},locked:false,area:"limpiezas",perfil:null};
+let S={main:null,extras:[],none:false,nivel:{},oniOpcion:null,origen:null,locked:false,area:"limpiezas",perfil:null};
 try{ S=Object.assign(S,JSON.parse(sessionStorage.getItem("bp_sel")||"{}")); }catch(e){}
 const save=()=>{try{sessionStorage.setItem("bp_sel",JSON.stringify(S))}catch(e){}};
 const extrasValidos=()=>S.extras.filter(e=>adicionalCompatible(e,S.main));
+function pid(e){ if(e!=="tratOni") return e; const o=ONI_OPCIONES.find(x=>x[0]===S.oniOpcion); return o?o[2]:"tratOni_pend"; }
+const oniTxt=()=>{const o=ONI_OPCIONES.find(x=>x[0]===S.oniOpcion); return o?o[1]:null;};
 const serviciosVisibles=()=>SERVICIOS.filter(s=>!s.soloHabitual||S.perfil==="habitual");
 const svc=id=>SERVICIOS.find(s=>s.id===id);
 const ext=id=>ADICIONALES.find(s=>s.id===id);
@@ -255,9 +268,9 @@ function abrirWA(texto){
   window.open("https://wa.me/"+WHATSAPP_NUM+"?text="+encodeURIComponent(texto),"_blank","noopener");
 }
 function textoVoucher(){
-  const ex=extrasValidos(), tot=total([S.main,...ex]);
+  const ex=extrasValidos(), tot=total([S.main,...ex].map(pid));
   let t="Hola, BeautyPod. Esta es mi elección:\n\nServicio: "+svc(S.main).n+" ("+fmtTxt(precio(S.main))+")\n\nAdicionales:\n";
-  t+= ex.length? ex.map(e=>"- "+ext(e).n+(SIN_PRECIO.includes(e)?"":" ("+fmtTxt(precio(e))+")")).join("\n") : "- Ninguno";
+  t+= ex.length? ex.map(e=>e==="tratOni"?"- "+ext(e).n+" ("+(oniTxt()?oniTxt()+": "+fmtTxt(precio(pid(e))):"a definir con la asistente")+")":"- "+ext(e).n+" ("+fmtTxt(precio(e))+")").join("\n") : "- Ninguno";
   t+="\n\nTotal: "+(tot.pending?"pendiente de confirmación":fmt(tot));
   t+="\n\nQuisiera coordinar una cita.";
   return t;
@@ -268,7 +281,7 @@ const robot='<svg viewBox="0 0 48 48" fill="none" stroke="#60a5fa" stroke-width=
 function logo(el){
   const i=new Image(); i.alt="BeautyPod"; i.width=36; i.height=36;
   i.onload=()=>{el.innerHTML="";el.appendChild(i)}; i.onerror=()=>{};
-  el.innerHTML=robot; i.src="assets/img/beautypod-logo.svg";
+  el.innerHTML='<img src="icons/icon-192.png?v=4" alt="BeautyPod" width="36" height="36" style="border-radius:8px">'; i.src="assets/img/beautypod-logo.svg";
 }
 const back=(to,label="Volver")=>((to==="home"||to==="perfil")&&S.locked)?"":`<button class="back" data-go="${to}">← ${label}</button>`;
 
@@ -296,12 +309,13 @@ ${hab?"":'<p class="lead">Selecciona el servicio que necesitas.</p>'}
 
 extras(){
   const m=S.main, items=ADICIONALES.filter(a=>adicionalCompatible(a.id,m)), ex=extrasValidos();
-  const ids=[m,...ex], tot=total(ids), ready=ex.length>0||S.none;
-  return back("limpiezas")+`
+  const ids=[m,...ex].map(pid), tot=total(ids), ready=ex.length>0||S.none;
+  const loc=S.origen==="locales";
+  return back(loc?"locales":"limpiezas")+`
 <div class="panel compact"><p class="eyebrow">Personaliza tu servicio</p><h1>¿Deseas agregar algo más?</h1>
-<div class="main-box"><b class="mname">${svc(m).n}</b>${svc(m).d?`<p>${svc(m).d}</p>`:""}<div class="price" style="${precio(m).pending?'font-size:1rem':''}">${fmtOP(precio(m))}</div></div>
+<div class="main-box">${loc?`<img class="photo" style="margin-bottom:12px" src="img/onicomicosis.jpg" alt="Onicomicosis">`:""}<b class="mname">${svc(m).n}</b>${svc(m).d?`<p>${svc(m).d}</p>`:""}<div class="price" style="${precio(m).pending?'font-size:1rem':''}">${fmtOP(precio(m))}</div></div>
 <h2 style="font-size:1.05rem">Servicios adicionales</h2><p class="note" style="font-size:.78rem">Puedes elegir los que desees.</p>
-<div class="stack sm" role="group">${items.map(a=>`<button class="opt" role="checkbox" aria-checked="${ex.includes(a.id)}" data-extra="${a.id}"><span><b>${a.n}</b></span><span class="dot"></span></button>`).join("")}
+<div class="stack sm" role="group">${items.map(a=>`<button class="opt" role="checkbox" aria-checked="${ex.includes(a.id)}" data-extra="${a.id}"><span><b>${a.n}</b><small>${a.d}</small></span><span class="dot"></span></button>${a.id==="tratOni"&&ex.includes("tratOni")?`<div class="stack sub">${ONI_OPCIONES.map(([k,n,t])=>`<button class="opt" role="radio" aria-checked="${S.oniOpcion===k}" data-onop="${k}"><span><b>${n}</b><small>${fmt(precio(t))}</small></span><span class="dot"></span></button>`).join("")}</div>`:""}`).join("")}
 <button class="opt" role="checkbox" aria-checked="${S.none}" data-none><span><b>No deseo ningún servicio adicional</b></span><span class="dot"></span></button></div>
 <div class="sum"><p class="eyebrow">Resumen de tu selección</p>
 <div class="row"><span>Servicio principal</span><span>${fmtOP(precio(m))}</span></div>
@@ -312,15 +326,16 @@ ${ready?"":'<p class="note">Selecciona un adicional o «No deseo ningún servici
 </div>`},
 
 voucher(){
-  const m=S.main, ex=extrasValidos(), tot=total([m,...ex]);
+  const m=S.main, ex=extrasValidos(), tot=total([m,...ex].map(pid));
   const rango=!tot.pending&&tot.min!==tot.max;
   return back("extras","Modificar selección")+`
 <div class="panel"><p class="eyebrow">BeautyPod · Resumen de servicio</p><h1>Tu voucher</h1>
 <div class="sum"><p class="eyebrow">Servicio principal</p>
 <div class="row"><span>${svc(m).n}</span><span>${fmtOP(precio(m))}</span></div>
 <p class="eyebrow" style="margin-top:14px">Adicionales</p>
-${ex.length?ex.map(e=>`<div class="row"><span>${ext(e).n}</span><span>${SIN_PRECIO.includes(e)?"":fmtOP(precio(e))}</span></div>`).join(""):'<div class="row"><span>Ninguno</span><span></span></div>'}
+${ex.length?ex.map(e=>`<div class="row"><span>${ext(e).n}${e==="tratOni"&&oniTxt()?" · "+oniTxt():""}</span><span>${e==="tratOni"&&!oniTxt()?'<span class="pend">A definir con la asistente</span>':fmtOP(precio(pid(e)))}</span></div>`).join(""):'<div class="row"><span>Ninguno</span><span></span></div>'}
 <div class="row t"><span>Total</span><span>${tot.pending?'<span class="pend" style="font-size:.85rem">Pendiente de confirmación</span>':fmt(tot)}</span></div></div>
+${ex.includes("tratOni")?`<div class="sum"><p class="eyebrow">Elige dónde aplicar el tratamiento</p><div class="stack">${ONI_OPCIONES.map(([k,n,t])=>{const tt=total([m,...ex].map(e=>e==="tratOni"?t:e));return `<button class="opt" role="radio" aria-checked="${S.oniOpcion===k}" data-onop="${k}"><span><b>${n}</b><small>Tratamiento: ${fmt(precio(t))} · Total: ${fmt(tt)||"pendiente"}</small></span><span class="dot"></span></button>`}).join("")}</div><p class="note" style="margin-bottom:0">Compara y elige la opción que mejor se adapte a ti. La decisión final se acuerda con la asistente y la especialista.</p></div>`:""}
 ${(tot.pending||rango)?'<p class="note">El importe puede variar según la valoración profesional.</p>':''}
 <p class="note">Este voucher es un resumen de tu selección. La cita no queda confirmada hasta que BeautyPod responda tu mensaje.</p>
 <p class="note"><b style="color:var(--soft)">Formas de pago:</b> efectivo o transferencia por Transfermóvil.</p>
@@ -357,7 +372,7 @@ function route(){
   if(view==="perfil"&&S.perfil&&S.locked) view="home";
   if((view==="extras"||view==="voucher")&&!svc(S.main)) view="limpiezas";
   // Tras pasar 2 pantallas (extras / tratamiento) ya no se puede volver a las primeras
-  if(["extras","voucher","problema"].includes(view)){ S.locked=true; S.area=view==="problema"?"locales":"limpiezas"; save(); }
+  if(["extras","voucher","problema"].includes(view)){ S.locked=true; S.area=(view==="problema"||S.origen==="locales")?"locales":"limpiezas"; save(); }
   else if(view==="limpiezas"||view==="locales"){ S.area=view; save(); }
   if(view==="home"&&S.locked){ location.replace("#/"+S.area); return; }
   const lg=document.querySelector("header .brand"); if(lg) lg.setAttribute("href","#/"+(S.locked?S.area:(S.perfil?"home":"perfil")));
@@ -366,13 +381,16 @@ function route(){
 }
 const go=p=>{location.hash="#/"+p};
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-go],[data-perfil],[data-main],[data-extra],[data-none],[data-prob],[data-nivel],[data-wa-voucher],[data-wa-prob],[data-wa-hablar]"); if(!t) return;
+  const t=e.target.closest("[data-go],[data-perfil],[data-main],[data-extra],[data-onop],[data-none],[data-prob],[data-nivel],[data-wa-voucher],[data-wa-prob],[data-wa-hablar]"); if(!t) return;
   const d=t.dataset;
   if(d.go!==undefined) return go(d.go);
   if(d.perfil){ S.perfil=d.perfil; if(d.perfil!=="habitual"&&svc(S.main)&&svc(S.main).soloHabitual){S.main=null;S.extras=[];S.none=false;} save(); return go("home"); }
-  if(d.main){ if(S.main!==d.main){S.extras=S.extras.filter(x=>adicionalCompatible(x,d.main));} S.main=d.main; save(); return go("extras"); }
-  if(d.extra){ S.none=false; S.extras=S.extras.includes(d.extra)?S.extras.filter(x=>x!==d.extra):[...S.extras,d.extra]; save(); return route(); }
+  if(d.main){ if(S.main!==d.main){S.extras=S.extras.filter(x=>adicionalCompatible(x,d.main));} S.main=d.main; S.origen="limpiezas"; save(); return go("extras"); }
+  if(d.onop){ S.oniOpcion=S.oniOpcion===d.onop?null:d.onop; save(); return route(); }
+  if(d.extra){ if(d.extra==="tratOni"&&S.extras.includes("tratOni")) S.oniOpcion=null; S.none=false; S.extras=S.extras.includes(d.extra)?S.extras.filter(x=>x!==d.extra):[...S.extras,d.extra]; save(); return route(); }
   if(d.none!==undefined){ S.none=!S.none; if(S.none) S.extras=[]; save(); return route(); }
+  if(d.prob==="onicomicosis"){ // mismo flujo que «Servicio de uñas micóticas», con la imagen
+    S.main="micoticas"; S.origen="locales"; S.extras=S.extras.filter(x=>adicionalCompatible(x,"micoticas")); save(); return go("extras"); }
   if(d.prob) return go("problema/"+d.prob);
   if(d.nivel){ const [pid,lid]=d.nivel.split("|"); S.nivel=S.nivel||{}; if(S.nivel[pid]===lid) delete S.nivel[pid]; else S.nivel[pid]=lid; save(); return route(); }
   if(d.waHablar){ let q; if(d.waHablar==="v") q=svc(S.main).n; else q=PROBLEMAS.find(x=>x.id===d.waHablar).n; return abrirWA("Hola, BeautyPod. Prefiero hablar con la asistente antes de decidir. Me interesa: "+q+"."); }
