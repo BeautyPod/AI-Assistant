@@ -1,5 +1,5 @@
-const CACHE="beautypod-ai-v10";
-const CORE=["./","./index.html","./manifest.json","./icons/icon-192.png","./icons/icon-512.png","./img/una-encarnada.jpg","./img/verrugas.jpg","./img/mal-olor.jpg","./img/callosidades.jpg","./img/onicomicosis.jpg","./assets/img/beautypod-logo.svg"];
+const CACHE="beautypod-ai-v12";
+const CORE=["./","./index.html","./manifest.json","./icons/icon-192.png","./icons/icon-512.png","./icons/icon-maskable-512.png","./icons/apple-touch-icon.png","./icons/icon-maskable-512.png","./img/una-encarnada.jpg","./img/verrugas.jpg","./img/mal-olor.jpg","./img/callosidades.jpg","./img/onicomicosis.jpg","./assets/img/beautypod-logo.svg"];
 // Un archivo faltante ya no impide instalar la app
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>Promise.all(CORE.map(u=>c.add(u).catch(()=>{})))).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
