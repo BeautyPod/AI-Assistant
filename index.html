@@ -1,3 +1,9 @@
+  if(d.go!==undefined) return go(d.go);
+  if(d.perfil){ S.perfil=d.perfil; if(d.perfil!=="habitual"&&svc(S.main)&&svc(S.main).soloHabitual){S.main=null;S.extras=[];S.none=false;} save(); return go("home"); }
+  if(d.main){ if(S.main!==d.main){S.extras=S.extras.filter(x=>adicionalCompatible(x,d.main));} S.main=d.main; S.origen="limpiezas"; save(); return go("extras"); }
+  if(d.onop){ S.oniOpcion=S.oniOpcion===d.onop?null:d.onop; save(); return route(); }
+  if(d.oniChange!==undefined){ return openOniModal(); }
+  if(d.oniPick){ oniTmp=d.oniPick; return renderOniModal(); }
   if(d.oniOk!==undefined){ if(oniTmp){ S.oniOpcion=oniTmp; save(); closeModal(); route(); } return; }
   if(d.oniCancel!==undefined){ if(!S.oniOpcion) S.extras=S.extras.filter(x=>x!=="tratOni"); save(); closeModal(); return route(); }
   if(d.extra){ const era=S.extras.includes(d.extra); if(d.extra==="tratOni"&&era) S.oniOpcion=null; S.none=false; S.extras=era?S.extras.filter(x=>x!==d.extra):[...S.extras,d.extra]; save(); route(); if(d.extra==="tratOni"&&!era) openOniModal(); return; }
