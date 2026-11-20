@@ -1,3 +1,417 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1c1c1c">
+<meta name="description" content="Asistente de servicios y consultas de BeautyPod, Matanzas, Cuba.">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icons/icon-192.png?v=4">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png?v=4">
+<title>AI Assistant | BeautyPod</title>
+<style>
+:root{--bg:#1c1c1c;--surface:#272727;--surface2:#333;--border:rgba(255,255,255,.08);--text:#f2f2f2;--muted:#a3a3a3;--soft:#d4d4d4;--accent:#60a5fa;--accent-h:#93c5fd;--on-accent:#0b1220;--r:12px;--fh:Cardo,Georgia,serif;--fb:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box}
+html{font-size:14px}body{margin:0;background:var(--bg);color:var(--text);font:1rem/1.55 var(--fb);min-height:100vh;display:flex;flex-direction:column}
+button{font:inherit;cursor:pointer}a{color:inherit}
+h1,h2,h3{font-family:var(--fh);font-weight:700;line-height:1.2;margin:0}
+.wrap{width:100%;max-width:960px;margin:0 auto;padding:0 16px}
+header{position:sticky;top:0;z-index:20;background:rgba(28,28,28,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding-top:env(safe-area-inset-top)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.brand svg,.brand img{width:36px;height:36px;flex:none}
+.brand b{font-family:var(--fh);font-size:1.25rem;display:block;line-height:1.1}.brand small{color:var(--muted);font-size:.75rem}
+.weblink{color:var(--accent);text-decoration:none;font-size:.9rem;font-weight:500;white-space:nowrap}.weblink:hover{color:var(--accent-h)}
+main{flex:1;padding:24px 0 32px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px}
+.eyebrow{color:var(--muted);font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;margin:0 0 6px}
+h1{font-size:1.8rem;margin-bottom:6px}h2{font-size:1.35rem}
+.lead{color:var(--soft);margin:0 0 18px}
+.back{background:none;border:0;color:var(--accent);padding:8px 0;margin-bottom:8px;font-size:.9rem}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:8px;text-align:left;color:inherit;width:100%}
+.card h3{font-size:1.15rem}.card p{margin:0;color:var(--muted);font-size:.92rem}
+.big{padding:22px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 20px;border-radius:var(--r);border:0;background:var(--accent);color:var(--on-accent);font-weight:600;text-decoration:none}
+.btn:hover{background:var(--accent-h)}.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn.full{width:100%}.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.go{color:var(--accent);font-size:.9rem;font-weight:500;margin-top:auto}
+button.card{cursor:pointer}button.card:hover,button.card:focus-visible{border-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent-h);outline-offset:2px}
+.info{border-style:dashed;border-color:rgba(96,165,250,.45);background:transparent}
+.opt{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface2);border:2px solid transparent;border-radius:var(--r);padding:14px 16px;width:100%;color:inherit;text-align:left;min-height:56px}
+.opt[aria-checked=true]{border-color:var(--accent);background:rgba(96,165,250,.12)}
+.opt b{font-weight:600}.opt small{display:block;color:var(--muted);font-size:.82rem}
+.dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--muted);flex:none;display:grid;place-items:center}
+.opt[aria-checked=true] .dot{background:var(--accent);border-color:var(--accent)}
+.opt[aria-checked=true] .dot::after{content:"✓";color:var(--on-accent);font-size:.8rem;font-weight:700}
+.stack{display:grid;gap:10px}
+.price{color:var(--accent);font-family:var(--fh);font-size:1.7rem;font-weight:700}
+.main-box{background:var(--surface2);border-radius:var(--r);padding:16px;margin:16px 0}
+.mname{font-family:var(--fh);font-size:1.15rem}
+.compact .card h3{font-size:.95rem}.compact .card p{font-size:.78rem}.compact .go{font-size:.78rem}.compact .card .btn{font-size:.85rem;min-height:40px}
+.compact .opt b{font-size:.85rem;font-weight:600}.compact .mname{font-size:.95rem}.compact .sub{margin:-2px 0 4px 18px;padding-left:12px;border-left:2px solid rgba(96,165,250,.4)}
+.modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.65);display:grid;place-items:center;padding:16px}
+.modal-box{max-width:440px;width:100%;max-height:90vh;overflow:auto}
+.card.tap{cursor:pointer}.card.tap:hover{border-color:var(--accent-h);box-shadow:0 0 18px rgba(96,165,250,.4)}
+:root{--hdr:calc(61px + env(safe-area-inset-top,0px))}
+.svc-sticky{position:sticky;top:var(--hdr);z-index:6;background:var(--surface);margin:0 -4px;padding:6px 4px 0}
+.svc-sticky .main-box{margin:0;padding:12px 14px;box-shadow:0 6px 14px rgba(0,0,0,.35)}
+.svc-sticky::after{content:"";position:absolute;left:0;right:0;bottom:-16px;height:16px;background:linear-gradient(var(--surface),transparent);pointer-events:none}
+.svc-row{display:flex;align-items:baseline;justify-content:space-between;gap:4px 12px;flex-wrap:wrap}
+.svc-sticky .mname{font-size:.95rem}.svc-sticky .price{font-size:1.4rem}
+.svc-row.tot{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:.85rem;color:var(--soft)}.tot-v{color:var(--accent);font-family:var(--fh);font-size:1.15rem}
+.main-box p{font-size:.78rem}.compact h2{font-size:1.1rem}.compact .note{font-size:.78rem}
+.main-box p{margin:2px 0 8px;color:var(--muted);font-size:.9rem}
+.sum{background:var(--surface2);border-radius:var(--r);padding:16px;margin:16px 0}
+.row{display:flex;justify-content:space-between;gap:12px;padding:6px 0}.row span:last-child{text-align:right;font-weight:600}
+.row.t{border-top:1px solid var(--border);margin-top:6px;padding-top:12px;font-size:1.1rem}.row.t span:last-child{color:var(--accent)}
+.note{color:var(--muted);font-size:.85rem;margin:10px 0}
+.pend{color:var(--muted);font-style:italic;font-weight:400}
+.photo{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;display:block}
+.g4{grid-template-columns:repeat(2,1fr)}.sm .card h3{font-size:.95rem}.sm .card p{font-size:.78rem}.sm .go{font-size:.78rem}.sm .btn{min-height:40px;font-size:.85rem}.sm .card{padding:14px}.sm .opt{min-height:46px;padding:10px 14px}.sm .opt b{font-size:.85rem}.sm .opt small{font-size:.72rem}
+.noimg{width:100%;aspect-ratio:16/9;border-radius:10px;background:var(--surface2)}@media(min-width:760px){.g4{grid-template-columns:repeat(3,1fr)}}
+.hero-img{max-width:420px;margin-bottom:14px}
+.off{background:var(--surface2);color:var(--soft);text-align:center;font-size:.85rem;padding:6px 12px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.site-footer{border-top:1px solid var(--border);background:#1a1a1a;padding:28px 0 calc(28px + env(safe-area-inset-bottom))}
+.footer-inner{display:grid;gap:18px}
+.footer-brand .logo{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-family:var(--fh);font-size:1.3rem;font-weight:700}
+#logo2{display:block;width:42px;height:42px;flex:0 0 42px}#logo2 img,#logo2 svg{display:block;width:42px;height:42px;object-fit:contain}
+.footer-brand p{margin:0;color:var(--muted);font-size:.9rem}
+.footer-address{font-style:normal;color:var(--muted);font-size:.9rem;line-height:1.8}
+.footer-address a{color:var(--accent);text-decoration:none}.footer-address a:hover{color:var(--accent-h)}
+.footer-social{display:flex;gap:10px}
+.social-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--soft)}
+.social-icon:hover{color:var(--accent-h);border-color:var(--accent)}
+.footer-copy{margin:0;color:var(--muted);font-size:.8rem}
+.card,.opt{border-color:rgba(96,165,250,.38);box-shadow:0 0 12px rgba(96,165,250,.22),inset 0 0 0 1px rgba(96,165,250,.08)}
+.opt{border-width:1px}.opt[aria-checked=true]{border-width:1px;border-color:var(--accent);box-shadow:0 0 16px rgba(96,165,250,.45),inset 0 0 0 1px var(--accent)}
+button.card:hover,button.card:focus-visible{border-color:var(--accent-h);box-shadow:0 0 18px rgba(96,165,250,.4)}
+.compact .opt small{font-size:.72rem;line-height:1.35;margin-top:2px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media(min-width:700px){h1{font-size:2.2rem}.panel{padding:28px}}
+</style>
+</head>
+<body>
+<div id="off" class="off" hidden>Sin conexión. Podrás seguir seleccionando; WhatsApp requiere conexión para completar el envío.</div>
+<header><div class="wrap">
+  <a class="brand" href="#/perfil" aria-label="BeautyPod AI Assistant">
+    <span id="logo"></span>
+    <span><b>BeautyPod</b><small>AI Assistant</small></span>
+  </a>
+  <a class="weblink" href="https://beautypod.github.io/Web/" target="_blank" rel="noopener">Ir a la página web</a>
+</div></header>
+<main><div class="wrap" id="app" aria-live="polite"></div></main>
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <p class="logo"><span id="logo2"></span><span>BeautyPod</span></p>
+      <p>Podología y cuidado de pies en Matanzas, Cuba.</p>
+    </div>
+    <address class="footer-address">
+      Calle 298 y Calle 131, Pueblo Nuevo, Matanzas, Cuba<br>
+      <a href="https://maps.app.goo.gl/Axdd4hyurDcGLANy8" target="_blank" rel="noopener noreferrer">Ver ubicación en Google Maps<span class="sr-only"> (se abre en una pestaña nueva)</span></a><br>
+      <a href="sms:+5353719118">SMS: +53 5371 9118</a>
+    </address>
+    <nav class="footer-social" aria-label="Redes sociales y reseñas de BeautyPod">
+      <a class="social-icon" href="https://www.facebook.com/bpodpedicure" target="_blank" rel="noopener noreferrer" aria-label="BeautyPod en Facebook (se abre en una pestaña nueva)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M15 8.5h1.7V5.6c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.3H7.3V15h2.7v8h3.1v-8h2.6l1.4-2.9h-3v-2c0-.8.2-1.6 1.9-1.6Z"/></svg></a>
+      <a class="social-icon" href="https://www.instagram.com/beautypodlinet?stkn=NXRxM3owdnd5Mzd5" target="_blank" rel="noopener noreferrer" aria-label="BeautyPod en Instagram (se abre en una pestaña nueva)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor"/></svg></a>
+      <a class="social-icon" href="https://t.me/bpplinet" target="_blank" rel="noopener noreferrer" aria-label="BeautyPod en Telegram (se abre en una pestaña nueva)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M9.78 18.65c-.4 0-.33-.15-.47-.53l-1.18-3.87 9-5.35c.4-.24.06-.35-.22-.14l-11.1 6.98-1.9-.6c-.44-.14-.44-.43.09-.65l16.4-6.32c.36-.16.71.09.57.66l-2.79 13.14c-.2.9-.75 1.11-1.51.71l-4.16-3.07-2 1.93c-.23.23-.42.42-.73.42Z"/></svg></a>
+      <a class="social-icon" href="https://wa.me/5353719118?text=%5BPW%5D%20Hola%2C%20quiero%20reservar%20una%20cita" target="_blank" rel="noopener noreferrer" aria-label="BeautyPod en WhatsApp (se abre en una pestaña nueva)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 2.5a9.5 9.5 0 0 0-8.2 14.3L2.5 21l4.3-1.3A9.5 9.5 0 1 0 12 2.5Zm5.4 13.6c-.24.66-1.2 1.24-1.86 1.34-.5.08-1.1.11-1.78-.1-.4-.13-.93-.3-1.6-.6-2.8-1.2-4.63-4.06-4.77-4.25-.14-.19-1.14-1.52-1.14-2.9 0-1.37.72-2.05.97-2.33.26-.28.57-.35.76-.35h.55c.17 0 .4-.07.63.48.24.56.8 1.96.88 2.1.08.15.13.32.03.51-.1.19-.15.31-.28.47-.14.17-.3.38-.42.52-.14.16-.29.32-.13.6.17.29.75 1.19 1.6 1.93 1.1.94 2 1.22 2.3 1.36.29.14.46.12.63-.08.17-.19.71-.82.9-1.1.19-.28.37-.24.64-.14.27.1 1.68.79 1.97.93.29.14.48.21.55.33.07.12.07.68-.16 1.33Z"/></svg></a>
+      <a class="social-icon" href="https://www.tripadvisor.com/Attraction_Review-g663510-d28549168-Reviews-Beautypod_Podologia_y_Pedicura-Matanzas_Matanzas_Province_Cuba.html" target="_blank" rel="noopener noreferrer" aria-label="BeautyPod en Tripadvisor (se abre en una pestaña nueva)"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M2.4 9.6C5 7 8.3 5.8 12 5.8s7 1.2 9.6 3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="7.6" cy="14" r="3.8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="16.4" cy="14" r="3.8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="7.6" cy="14" r="1.4" fill="currentColor"/><circle cx="16.4" cy="14" r="1.4" fill="currentColor"/><path d="M12 14.2l-1.3 1.9h2.6z" fill="currentColor"/></svg></a>
+    </nav>
+    <p class="footer-copy">© <span id="yr"></span> BeautyPod. Todos los derechos reservados.</p>
+  </div>
+</footer>
+
+<script>
+/* ============ 1. CONFIGURACIÓN GENERAL ============ */
+const WHATSAPP_NUM = "5353719118";
+
+/* ============ 2. TARIFAS ORIGINALES (no modificar) ============
+   base: número | [mín, máx] | null (pendiente de confirmación)
+   ajuste:false → excluida de los ajustes globales */
+const REFERENCIA_ORIGINAL = { id:"sano", precioCUP:1500, usd:3, tasa:500 };
+const TARIFAS = {
+  corte:{base:500}, micoticas:{base:[800,1000]}, sano:{base:1500}, micotico:{base:[2000,2500]}, micosisTrat:{base:1000},
+  tratOni_salon:{base:800}, tratOni_casa:{base:2500}, tratOni_pend:{base:null},
+  grietas:{base:[2000,2500]}, micoGrietas:{base:[2500,3000]},
+  // Adicionales (lista de la especialista en USD x 500 CUP/USD)
+  esmalte:{base:500},          // 1 USD
+  masaje5:{base:500},          // 1 USD
+  masaje10:{base:1000},        // 2 USD
+  cuppingPies:{base:1000},     // 2 USD (masaje y cupping en pies)
+  cuppingPantPies:{base:1500}, // 3 USD (masaje y cupping completo: pantorrillas + pies)
+  electro:{base:500},          // 1 USD
+  cosmetica:{base:500},        // 1 USD
+  // Tratamientos localizados: rango informativo en CUP (mín–máx de la lista de la especialista, a la tasa original 500 CUP/USD)
+  unaEncarnada:{base:[500,3000]},   // Espiculotomía / ortonixia: 1–6 USD
+  verrugas:{base:[1000,3000]},      // Papilomas: láser, cauterización con ácidos, legrado: 2–6 USD
+  // Por gravedad (USD de la especialista x 500)
+  unaEncarnada_molestia:{base:500}, unaEncarnada_g1:{base:[1000,2000]}, unaEncarnada_g2:{base:1500}, unaEncarnada_g3:{base:[1500,3000]},
+  verrugas_unica:{base:1000}, verrugas_multiples:{base:[2000,2500]},
+  callosidades_leve:{base:1000}, callosidades_moderado:{base:[1000,1500]}, callosidades_severo:{base:[1500,2000]},
+  malOlor:{base:[1500,2000]},       // Queratólisis punctata: 3–4 USD
+  callosidades:{base:[1000,2000]},  // Helomas: 2–4 USD
+  onicomicosis:{base:[1000,2500]}   // Láser, ácidos, ELAN: 2–5 USD
+};
+
+/* ============ 3. ACTUALIZACIÓN GLOBAL (elegir UNA modalidad) ============ */
+const MODALIDAD_GLOBAL = "CUP";          // "CUP" o "USD"
+const CUP_PRECIO_ACTUAL_SANO = 1500;     // Modalidad CUP: nuevo precio del Preventivo Completo (Sano)
+const USD_TASA_ACTUAL = 500;             // Modalidad USD: nueva tasa CUP/USD
+
+/* ============ 4. CAMBIOS ESPECÍFICOS (prevalecen sobre lo global) ============
+   Ejemplos: corte: 600,  grietas: [2200, 2700] */
+const CAMBIOS_ESPECIFICOS = {
+  // corte: 600,
+};
+
+/* ============ 5. REGLAS DE COMPATIBILIDAD ============ */
+const ESMALTE_HABILITADO = { corte:true, micoticas:false, sano:true, micotico:false, grietas:true, micoGrietas:false };
+// Otros adicionales: sin matriz definida → se ofrecen en todos los servicios (pendiente de confirmar).
+const ADICIONAL_NO_COMPATIBLE = {}; // ej.: { parafina:["micoticas"] }
+// «Quiero comenzar tratamiento de onicomicosis»: el cliente elige dónde se aplica; sin elegir, queda a definir (total pendiente)
+const ONI_OPCIONES = [["salon","Tratamiento en el salón","tratOni_salon"],["casa","Fórmula ELAN (tratamiento en casa)","tratOni_casa"]];
+const ONI_INFO = {
+  salon:"Ácidos podológicos especializados en onicomicosis, aplicados expresamente por la especialista.",
+  casa:"Fórmula ELAN para aplicar en casa. Se usa diariamente."
+};
+const ONI_NOTA = "Para ayudar a la efectividad de cualquiera de los dos tratamientos, se recomienda realizar una limpieza de uña (desbaste mecánico) cada 15 días, máximo cada 21 días. No es obligatorio, pero se aconseja.";
+const TIENDA_URL = "https://beautypod.github.io/Web/tienda.html"; // más información sobre la fórmula ELAN
+const TRAT_ONI_HABILITADO = { micoticas:true, micotico:true, micoGrietas:true };
+function adicionalCompatible(extraId, mainId){
+  if(extraId==="tratOni") return TRAT_ONI_HABILITADO[mainId]===true;
+  if(extraId==="esmalte") return ESMALTE_HABILITADO[mainId]===true;
+  return !(ADICIONAL_NO_COMPATIBLE[extraId]||[]).includes(mainId);
+}
+
+/* ============ 6. CATÁLOGO ============ */
+const SERVICIOS = [
+  {id:"corte",n:"Corte de uñas sanas",d:"Corte anatómico preventivo para ayudar a evitar uñas encarnadas."},
+  {id:"micosisTrat",n:"Servicio de uñas con micosis en tratamiento",d:"",soloHabitual:true},
+  {id:"micoticas",n:"Servicio de uñas micóticas",d:"Servicio de limpieza y desbaste profesional para uñas con onicomicosis."},
+  {id:"sano",n:"Servicio Preventivo Completo (Sano)",d:"Servicio de limpieza completa de uñas y plantas; incluye resequedad y descamación de la zona plantar."},
+  {id:"micotico",n:"Servicio Preventivo Completo (Micótico)",d:"Servicio de limpieza completa con onicomicosis."},
+  {id:"grietas",n:"Servicio Preventivo Completo (Grietas)",d:"Servicio de limpieza completa con fisuras y grietas."},
+  {id:"micoGrietas",n:"Servicio Preventivo Completo (Micótico y Grietas)",d:"Servicio de limpieza completa con grietas y onicomicosis."}
+];
+const ADICIONALES = [ // d: descripción corta (basada en la web de BeautyPod)
+  {id:"esmalte",n:"Esmalte",d:"Servicio cosmético para uñas sanas, cuidando la integridad de la uña."},
+  {id:"masaje5",n:"Masaje manual de 5 minutos",d:"Masaje breve que relaja y alivia la sensación de cansancio y pesadez en los pies."},
+  {id:"masaje10",n:"Masaje manual de 10 minutos",d:"Masaje más prolongado que relaja y alivia la sensación de cansancio y pesadez en los pies."},
+  {id:"cuppingPies",n:"Masaje y cupping en pies",d:"Masaje con ventosas que estimulan los tejidos de la planta del pie; puede ayudar a relajar la tensión y mejorar la circulación local."},
+  {id:"cuppingPantPies",n:"Masaje y cupping completo (pantorrillas y pies)",d:"Masaje con ventosas en pantorrillas y pies para ayudar a relajar la tensión y la pesadez."},
+  {id:"electro",n:"Electroestimulación",d:"Aparatología que favorece la penetración de activos hidratantes y reparadores en la piel."},
+  {id:"cosmetica",n:"Cosmética asistida con ultrasonido o LED",d:"Hidratación asistida con ultrasonido o luz LED para favorecer la absorción de los activos."},
+  {id:"tratOni",n:"Deseo tratamiento para mi onicomicosis",d:"Elige entre el tratamiento en el salón o la fórmula ELAN para aplicar en casa."}
+];
+/* TEXTOS PENDIENTES DE VALIDACIÓN por la especialista (redacción provisional, informativa, sin diagnóstico) */
+const PROBLEMAS = [
+  {id:"unaEncarnada",n:"Uña encarnada",img:"una-encarnada",
+   niveles:[["unaEncarnada_molestia","Molestia","Sin inflamación ni enrojecimiento."],["unaEncarnada_g1","Grado 1","Inflamación, enrojecimiento y dolor."],["unaEncarnada_g2","Grado 2","Además, supuración y pus."],["unaEncarnada_g3","Grado 3","Supuración con granuloma (tumoración benigna)."]],
+   t:"Ocurre cuando el borde de la uña se introduce en la piel que la rodea y puede causar dolor o molestia.",
+   a:"La profesional valorará tu caso y determinará la alternativa de atención más adecuada."},
+  {id:"verrugas",n:"Verrugas plantares",img:"verrugas",
+   niveles:[["verrugas_unica","Única","Una sola lesión."],["verrugas_multiples","Múltiples","Varias lesiones, según valoración."]],
+   t:"Son lesiones en la planta del pie que pueden resultar molestas al caminar.",
+   a:"La profesional valorará el pie y determinará la alternativa de atención disponible."},
+  {id:"malOlor",n:"Mal olor",img:"mal-olor",
+   t:"Es un olor persistente en los pies que puede tener distintas causas.",
+   a:"La profesional valorará tu caso y te orientará sobre las alternativas de atención."},
+  {id:"onicomicosis",n:"Onicomicosis",img:"onicomicosis",
+   t:"Es una afección de las uñas causada por hongos que puede cambiar su color, grosor o aspecto. Este espacio es para quienes desean atender una o dos uñas específicas.",
+   a:"La profesional valorará tu caso y determinará la alternativa de tratamiento disponible."},
+  {id:"callosidades",n:"Callosidades",img:"callosidades",
+   niveles:[["callosidades_leve","Leve","1 o 2 pequeñas."],["callosidades_moderado","Moderado","3 a 5 pequeñas o medianas, 1 o 2 grandes, o pocas miliares."],["callosidades_severo","Severo","Miliares múltiples, más de 2 grandes o casos complejos."]],
+   t:"Son zonas de piel engrosada, habituales en áreas de roce o presión del pie.",
+   a:"La profesional valorará el pie y determinará la alternativa de atención adecuada."}
+];
+
+/* ============ 7. FUNCIONES DE CÁLCULO (fuente única de precios) ============ */
+const redondear = n => Math.round(n);
+const valido = n => typeof n==="number" && isFinite(n) && n>0;
+function normalizar(v){ // → [min,max] | null
+  const a = Array.isArray(v)?v:[v];
+  if(a.length<1||a.length>2||!a.every(valido)) return null;
+  const mn=Math.min(...a), mx=Math.max(...a); return [mn,mx];
+}
+function aplicarGlobal(id,base){
+  const t=TARIFAS[id]; if(t.ajuste===false) return base;
+  if(MODALIDAD_GLOBAL==="CUP"){
+    const dif = CUP_PRECIO_ACTUAL_SANO - REFERENCIA_ORIGINAL.precioCUP;
+    return base.map(x=>redondear(x+dif));
+  }
+  if(MODALIDAD_GLOBAL==="USD")
+    return base.map(x=>redondear(x/REFERENCIA_ORIGINAL.tasa*USD_TASA_ACTUAL));
+  return base;
+}
+/* Devuelve {min,max} o {pending:true} */
+function precio(id){
+  if(Object.prototype.hasOwnProperty.call(CAMBIOS_ESPECIFICOS,id)){
+    const e=normalizar(CAMBIOS_ESPECIFICOS[id]); if(e) return {min:e[0],max:e[1]};
+    console.warn("Cambio específico inválido:",id);
+  }
+  const b=TARIFAS[id]&&TARIFAS[id].base; if(b==null) return {pending:true};
+  const base=normalizar(b); if(!base) return {pending:true};
+  const g=aplicarGlobal(id,base); if(!g.every(valido)) return {pending:true};
+  return {min:g[0],max:g[1]};
+}
+function total(ids){
+  let mn=0,mx=0;
+  for(const id of ids){ const p=precio(id); if(p.pending) return {pending:true}; mn+=p.min; mx+=p.max;}
+  return {min:mn,max:mx};
+}
+const num = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g,".");
+function fmt(p){ if(p.pending) return null; return (p.min===p.max?num(p.min):num(p.min)+"–"+num(p.max))+" CUP"; }
+const fmtOP = p => fmt(p) || '<span class="pend">Precio pendiente de confirmación</span>';
+const fmtTxt = p => fmt(p) || "Precio pendiente de confirmación";
+
+/* ============ 8. ESTADO ============ */
+let S={main:null,extras:[],none:false,nivel:{},oniOpcion:null,origen:null,locked:false,area:"limpiezas",perfil:null};
+try{ S=Object.assign(S,JSON.parse(sessionStorage.getItem("bp_sel")||"{}")); }catch(e){}
+const save=()=>{try{sessionStorage.setItem("bp_sel",JSON.stringify(S))}catch(e){}};
+const extrasValidos=()=>S.extras.filter(e=>adicionalCompatible(e,S.main));
+function pid(e){ if(e!=="tratOni") return e; const o=ONI_OPCIONES.find(x=>x[0]===S.oniOpcion); return o?o[2]:"tratOni_pend"; }
+const oniTxt=()=>{const o=ONI_OPCIONES.find(x=>x[0]===S.oniOpcion); return o?o[1]:null;};
+const serviciosVisibles=()=>SERVICIOS.filter(s=>!s.soloHabitual||S.perfil==="habitual");
+const svc=id=>SERVICIOS.find(s=>s.id===id);
+const ext=id=>ADICIONALES.find(s=>s.id===id);
+
+/* ============ 9. WHATSAPP ============ */
+function abrirWA(texto){
+  if(S.perfil==="habitual") texto=texto.replace("Hola, BeautyPod.","Hola, BeautyPod. Soy cliente habitual.");
+  if(!navigator.onLine){alert("WhatsApp requiere conexión a internet. Cuando vuelvas a tener conexión, podrás completar el envío.");return;}
+  window.open("https://wa.me/"+WHATSAPP_NUM+"?text="+encodeURIComponent(texto),"_blank","noopener");
+}
+function textoVoucher(){
+  const ex=extrasValidos(), tot=total([S.main,...ex].map(pid));
+  let t="Hola, BeautyPod. Esta es mi elección:\n\nServicio: "+svc(S.main).n+"\n\nAdicionales:\n";
+  t+= ex.length? ex.map(e=>"- "+ext(e).n+(e==="tratOni"?" ("+(oniTxt()||"a definir con la asistente")+")":"")).join("\n") : "- Ninguno";
+  t+="\n\nTotal: "+(tot.pending?"pendiente de confirmación":fmt(tot));
+  t+="\n\nQuisiera coordinar una cita.";
+  return t;
+}
+
+/* ============ 10. VISTAS ============ */
+const robot='<svg viewBox="0 0 48 48" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="12" y="16" width="24" height="20" rx="6"/><circle cx="19" cy="26" r="2" fill="#60a5fa"/><circle cx="29" cy="26" r="2" fill="#60a5fa"/><path d="M24 16v-5"/><circle cx="24" cy="9" r="2"/><path d="M8 24v6M40 24v6M8 30c0 5 4 8 10 8h2"/><circle cx="21" cy="38" r="1.5" fill="#60a5fa"/></svg>';
+function logo(el){
+  const i=new Image(); i.alt="BeautyPod"; i.width=36; i.height=36;
+  i.onload=()=>{el.innerHTML="";el.appendChild(i)}; i.onerror=()=>{};
+  el.innerHTML='<img src="icons/icon-192.png?v=4" alt="BeautyPod" width="36" height="36" style="border-radius:8px">'; i.src="assets/img/beautypod-logo.svg";
+}
+const back=(to,label="Volver")=>((to==="home"||to==="perfil")&&S.locked)?"":`<button class="back" data-go="${to}">← ${label}</button>`;
+
+function eleccionHTML(){
+  const m=S.main, ex=extrasValidos(), tot=total([m,...ex].map(pid));
+  const rango=!tot.pending&&tot.min!==tot.max;
+  return `<div class="eleccion" style="margin-top:20px;padding-top:6px;border-top:1px solid var(--border)">
+<p class="eyebrow" style="margin-top:14px">BeautyPod · Resumen de servicio</p><h2 style="margin-bottom:10px">Mi elección</h2>
+<div class="sum"><p class="eyebrow">Servicio principal</p>
+<div class="row"><span>${svc(m).n}</span><span>${fmtOP(precio(m))}</span></div>
+<p class="eyebrow" style="margin-top:14px">Adicionales</p>
+${ex.length?ex.map((e,i)=>`<div class="row"><span>Adicional ${i+1}: ${ext(e).n}${e==="tratOni"&&oniTxt()?" · "+oniTxt():""}</span><span>${e==="tratOni"&&!oniTxt()?'<span class="pend">A definir con la asistente</span>':""}</span></div>`).join(""):'<div class="row"><span>Ninguno</span><span></span></div>'}
+<div class="row t"><span>Total</span><span>${tot.pending?'<span class="pend" style="font-size:.85rem">Pendiente de confirmación</span>':fmt(tot)}</span></div></div>
+${ex.includes("tratOni")?`<p class="note"><b style="color:var(--soft)">Recomendación:</b> ${ONI_NOTA}</p>`:""}
+${(tot.pending||rango)?'<p class="note">El importe puede variar según la valoración profesional.</p>':''}
+<p class="note">Este es un resumen de tu elección. La cita no queda confirmada hasta que BeautyPod responda tu mensaje.</p>
+<p class="note"><b style="color:var(--soft)">Formas de pago:</b> efectivo o transferencia por Transfermóvil.</p>
+<button class="btn full" data-wa-voucher>Enviar mi decisión a la asistente</button>
+<button class="btn ghost full" style="margin-top:10px" data-wa-hablar="v">Deseo mejor hablar con la asistente</button></div>`;
+}
+const V={
+perfil(){return `
+<div class="panel"><h1>Bienvenido a BeautyPod</h1><p class="lead">Selecciona una opción.</p>
+<div class="grid g2">
+ <div class="card big tap" data-perfil="nuevo"><h3>Cliente nuevo</h3><p>Conoce nuestros servicios y elige el que necesitas.</p><button class="btn" data-perfil="nuevo">Entrar →</button></div>
+ <div class="card big tap" data-perfil="habitual"><h3>Cliente habitual</h3><p>Ve directo a tu servicio.</p><button class="btn" data-perfil="habitual">Entrar →</button></div>
+</div></div>`},
+
+home(){const hab=S.perfil==="habitual";return back("perfil")+`
+<div class="panel">${hab?'<h1>Bienvenido de nuevo</h1><p class="lead">Elige lo que necesitas hoy.</p>':'<h1>¿Qué servicio buscas?</h1><p class="lead">Selecciona el tipo de atención que necesitas.</p>'}
+<div class="grid g2">
+ <div class="card big tap" data-go="limpiezas"><h3>Limpiezas y cuidados podológicos</h3>${hab?"":"<p>Para el cuidado de uñas, plantas y piel de tus pies.</p>"}<button class="btn" data-go="limpiezas">Entrar →</button></div>
+ <div class="card big tap" data-go="locales"><h3>Tratamientos podológicos localizados</h3>${hab?"":"<p>Para problemas específicos que requieren atención localizada.</p>"}<button class="btn" data-go="locales">Entrar →</button></div>
+</div></div>`},
+
+limpiezas(){const hab=S.perfil==="habitual";return back("home")+`
+<div class="panel compact"><p class="eyebrow">Limpiezas y cuidados podológicos</p><h1>${hab?"¿Qué necesitas hoy?":"¿Qué problema deseas atender?"}</h1>
+${hab?"":'<p class="lead">Selecciona el servicio que necesitas.</p>'}
+<div class="stack sm">${serviciosVisibles().map(s=>`<button class="card" data-main="${s.id}"><h3>${s.n}</h3>${hab?"":`<p>${s.d}</p>`}<span class="go">Seleccionar →</span></button>`).join("")}
+
+</div></div>`},
+
+extras(){
+  const m=S.main, items=ADICIONALES.filter(a=>adicionalCompatible(a.id,m)), ex=extrasValidos();
+  const ready=ex.length>0||S.none, loc=S.origen==="locales", tot=total([m,...ex].map(pid));
+  items.sort((x,y)=>(y.id==="tratOni")-(x.id==="tratOni"));
+  return back(loc?"locales":"limpiezas")+`
+<div class="panel"><p class="eyebrow">Personaliza tu servicio</p><h1>¿Deseas agregar algo más?</h1>
+${loc?`<img class="photo" style="margin-bottom:12px" src="img/onicomicosis.jpg" alt="Onicomicosis">`:""}
+<div class="svc-sticky"><div class="main-box"><div class="svc-row"><b class="mname">${svc(m).n}</b><div class="price" style="${precio(m).pending?'font-size:1rem':''}">${fmtOP(precio(m))}</div></div></div></div>
+${svc(m).d?`<p class="note" style="margin:16px 0 0">${svc(m).d}</p>`:""}
+<div class="compact"><h2 style="font-size:1.05rem;margin-top:16px">Servicios adicionales</h2><p class="note" style="font-size:.78rem">Puedes elegir los que desees.</p>
+<div class="stack sm" role="group"><button class="opt" role="checkbox" aria-checked="${S.none}" data-none><span><b>No deseo ningún servicio adicional</b></span><span class="dot"></span></button>
+${items.map(a=>`<button class="opt" role="checkbox" aria-checked="${ex.includes(a.id)}" data-extra="${a.id}"><span><b>${a.n}</b><small>${a.d}</small></span><span class="dot"></span></button>${a.id==="tratOni"&&ex.includes("tratOni")?`<div class="stack sub"><button class="opt" data-oni-change><span><b>${oniTxt()||"Elegir tratamiento"}</b><small>${S.oniOpcion?"Toca para cambiar":"Elige uno de los dos tratamientos"}</small></span></button></div>`:""}`).join("")}</div></div>
+${ready?eleccionHTML():'<p class="note" style="margin-top:16px">Selecciona un adicional o «No deseo ningún servicio adicional» para ver tu elección.</p>'}
+</div>`},
+
+locales(){return back("home")+`
+<div class="panel"><p class="eyebrow">Tratamientos localizados</p><h1>¿Qué problema deseas atender?</h1>
+<p class="lead">Selecciona el problema que deseas consultar.</p>
+<div class="grid g4">${PROBLEMAS.map(p=>`<button class="card" data-prob="${p.id}">${p.img?`<img class="photo" src="img/${p.img}.jpg" alt="${p.n}" loading="lazy">`:'<div class="noimg"></div>'}<h3>${p.n}</h3><span class="go">Entrar →</span></button>`).join("")}</div></div>`},
+
+problema(id){
+  const p=PROBLEMAS.find(x=>x.id===id); if(!p) return V.locales();
+  const pr=precio(id), niv=p.niveles||[], sel=(S.nivel||{})[id]||null, nivSel=niv.find(x=>x[0]===sel);
+  return back("locales")+`
+<div class="panel"><p class="eyebrow">Tratamientos localizados</p><h1>${p.n}</h1>
+${p.img?`<img class="photo hero-img" src="img/${p.img}.jpg" alt="${p.n}">`:""}
+<p class="lead">${p.t}</p><p style="margin:0 0 14px">${p.a}</p>
+${niv.length?`<h2 style="margin:6px 0 4px">¿Cómo se encuentra?</h2><p class="note" style="margin-top:0">Marca la opción que más se parezca a tu caso.</p>
+<div class="stack" role="radiogroup">${niv.map(([lid,n,d])=>`<button class="opt" role="radio" aria-checked="${sel===lid}" data-nivel="${p.id}|${lid}"><span><b>${n}</b><small>${d}</small></span><span class="dot"></span></button>`).join("")}</div>
+${sel?`<div class="main-box"><p>Precio para «${nivSel[1]}»</p><div class="price">${fmtOP(precio(sel))}</div><p style="margin:8px 0 0">El precio depende del diagnóstico realizado por la especialista.</p></div>`:""}`
+:(pr.pending?"":`<div class="main-box"><p>Rango de precio informativo</p><div class="price">${fmt(pr)}</div><p style="margin:8px 0 0">El precio depende del diagnóstico realizado por la especialista.</p></div>`)}
+<p class="note"><b style="color:var(--soft)">Formas de pago:</b> efectivo o transferencia por Transfermóvil.</p>
+<p class="note" style="margin-top:0">Si deseas más detalles, puedes hablar con la asistente por WhatsApp.</p>
+<button class="btn full" data-wa-prob="${p.id}">${p.id==="onicomicosis"?"Diagnóstico y solicitud de tratamiento":"Enviar mi decisión a la asistente"}</button>
+<button class="btn ghost full" style="margin-top:10px" data-wa-hablar="${p.id}">Deseo mejor hablar con la asistente</button></div>`}
+};
+
+/* ============ 11. NAVEGACIÓN ============ */
+let oniTmp=null, lastView=null;
+function closeModal(){ const m=document.getElementById("modal"); if(m) m.remove(); document.body.style.overflow=""; }
+function openOniModal(){ closeModal(); oniTmp=S.oniOpcion; const m=document.createElement("div"); m.id="modal"; m.className="modal"; document.body.appendChild(m); document.body.style.overflow="hidden"; renderOniModal(); }
+function renderOniModal(){
+  const m=document.getElementById("modal"); if(!m) return;
+  m.innerHTML=`<div class="panel modal-box" role="dialog" aria-modal="true" aria-label="Tratamiento de onicomicosis">
+  <p class="eyebrow">Tratamiento de onicomicosis</p><h2 style="margin-bottom:6px">Elige uno de los dos tratamientos</h2>
+  <p class="note" style="margin-top:0">Son completamente distintos entre sí.</p>
+  <div class="stack">${ONI_OPCIONES.map(([k,n,t])=>`<button class="opt" role="radio" aria-checked="${oniTmp===k}" data-oni-pick="${k}"><span><b>${n}</b><small>${ONI_INFO[k]}</small></span><span class="dot"></span></button>`).join("")}</div>
+  <p class="note"><a href="${TIENDA_URL}" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">Más información sobre la fórmula ELAN en la tienda</a></p>
+  <div class="main-box" style="margin:12px 0;border-left:3px solid var(--accent)"><p style="margin:0;color:var(--soft)"><b>Recomendación:</b> ${ONI_NOTA}</p></div>
+  <button class="btn full" data-oni-ok ${oniTmp?"":"disabled"}>Aceptar</button>
+  <button class="back" style="width:100%;text-align:center;margin:8px 0 0" data-oni-cancel>Cancelar</button></div>`;
+}
+function route(){
+  const [v,arg]=(location.hash.replace(/^#\/?/,"")||"perfil").split("/");
+  let view=v==="voucher"?"extras":(V[v]?v:"perfil");
+  if(!S.perfil) view="perfil";
+  if(view==="perfil"&&S.perfil&&S.locked) view="home";
+  if((view==="extras"||view==="voucher")&&!svc(S.main)) view="limpiezas";
+  // Tras pasar 2 pantallas (extras / tratamiento) ya no se puede volver a las primeras
+  if(["extras","voucher","problema"].includes(view)){ S.locked=true; S.area=(view==="problema"||S.origen==="locales")?"locales":"limpiezas"; save(); }
+  else if(view==="limpiezas"||view==="locales"){ S.area=view; save(); }
+  if(view==="home"&&S.locked){ location.replace("#/"+S.area); return; }
+  const lg=document.querySelector("header .brand"); if(lg) lg.setAttribute("href","#/"+(S.locked?S.area:(S.perfil?"home":"perfil")));
+  document.getElementById("app").innerHTML=V[view](arg);
+  const key=view+"/"+(arg||""); if(key!==lastView) window.scrollTo(0,0); lastView=key;
+}
+const go=p=>{location.hash="#/"+p};
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-go],[data-perfil],[data-main],[data-extra],[data-onop],[data-oni-change],[data-oni-pick],[data-oni-ok],[data-oni-cancel],[data-none],[data-prob],[data-nivel],[data-wa-voucher],[data-wa-prob],[data-wa-hablar]"); if(!t) return;
+  const d=t.dataset;
   if(d.go!==undefined) return go(d.go);
   if(d.perfil){ S.perfil=d.perfil; if(d.perfil!=="habitual"&&svc(S.main)&&svc(S.main).soloHabitual){S.main=null;S.extras=[];S.none=false;} save(); return go("home"); }
   if(d.main){ if(S.main!==d.main){S.extras=S.extras.filter(x=>adicionalCompatible(x,d.main));} S.main=d.main; S.origen="limpiezas"; save(); return go("extras"); }
