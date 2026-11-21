@@ -76,8 +76,7 @@ button.card{cursor:pointer}button.card:hover,button.card:focus-visible{border-co
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .site-footer{border-top:1px solid var(--border);background:#1a1a1a;padding:28px 0 calc(28px + env(safe-area-inset-bottom))}
 .footer-inner{display:grid;gap:18px}
-.footer-brand .logo{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-family:var(--fh);font-size:1.3rem;font-weight:700}
-#logo2{display:block;width:42px;height:42px;flex:0 0 42px}#logo2 img,#logo2 svg{display:block;width:42px;height:42px;object-fit:contain}
+.footer-brand .logo{display:flex;align-items:baseline;gap:10px;margin:0 0 6px;font-family:var(--fh);font-size:1.3rem;font-weight:700}
 .footer-brand p{margin:0;color:var(--muted);font-size:.9rem}
 .footer-address{font-style:normal;color:var(--muted);font-size:.9rem;line-height:1.8}
 .footer-address a{color:var(--accent);text-decoration:none}.footer-address a:hover{color:var(--accent-h)}
@@ -97,8 +96,7 @@ button.card:hover,button.card:focus-visible{border-color:var(--accent-h);box-sha
 <div id="off" class="off" hidden>Sin conexión. Podrás seguir seleccionando; WhatsApp requiere conexión para completar el envío.</div>
 <header><div class="wrap">
   <a class="brand" href="#/perfil" aria-label="BeautyPod AI Assistant">
-    <span id="logo"></span>
-    <span><b>BeautyPod</b><small>AI Assistant</small></span>
+        <span><b>BeautyPod</b><small>Asistente virtual</small></span>
   </a>
   <a class="weblink" href="https://beautypod.github.io/Web/" target="_blank" rel="noopener">Ir a la página web</a>
 </div></header>
@@ -106,7 +104,7 @@ button.card:hover,button.card:focus-visible{border-color:var(--accent-h);box-sha
 <footer class="site-footer">
   <div class="wrap footer-inner">
     <div class="footer-brand">
-      <p class="logo"><span id="logo2"></span><span>BeautyPod</span></p>
+      <p class="logo"><span>BeautyPod</span><small style="font-family:var(--fb);font-size:.75rem;font-weight:400;color:var(--muted)">Asistente virtual</small></p>
       <p>Podología y cuidado de pies en Matanzas, Cuba.</p>
     </div>
     <address class="footer-address">
@@ -296,11 +294,7 @@ function textoVoucher(){
 
 /* ============ 10. VISTAS ============ */
 const robot='<svg viewBox="0 0 48 48" fill="none" stroke="#60a5fa" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="12" y="16" width="24" height="20" rx="6"/><circle cx="19" cy="26" r="2" fill="#60a5fa"/><circle cx="29" cy="26" r="2" fill="#60a5fa"/><path d="M24 16v-5"/><circle cx="24" cy="9" r="2"/><path d="M8 24v6M40 24v6M8 30c0 5 4 8 10 8h2"/><circle cx="21" cy="38" r="1.5" fill="#60a5fa"/></svg>';
-function logo(el){
-  const i=new Image(); i.alt="BeautyPod"; i.width=36; i.height=36;
-  i.onload=()=>{el.innerHTML="";el.appendChild(i)}; i.onerror=()=>{};
-  el.innerHTML='<img src="icons/icon-192.png?v=4" alt="BeautyPod" width="36" height="36" style="border-radius:8px">'; i.src="assets/img/beautypod-logo.svg";
-}
+
 const back=(to,label="Volver")=>((to==="home"||to==="perfil")&&S.locked)?"":`<button class="back" data-go="${to}">← ${label}</button>`;
 
 function eleccionHTML(){
@@ -352,8 +346,8 @@ ${loc?`<img class="photo" style="margin-bottom:12px" src="img/onicomicosis.jpg" 
 <div class="svc-sticky"><div class="main-box"><div class="svc-row"><b class="mname">${svc(m).n}</b><div class="price" style="${precio(m).pending?'font-size:1rem':''}">${fmtOP(precio(m))}</div></div></div></div>
 ${svc(m).d?`<p class="note" style="margin:16px 0 0">${svc(m).d}</p>`:""}
 <div class="compact"><h2 style="font-size:1.05rem;margin-top:16px">Servicios adicionales</h2><p class="note" style="font-size:.78rem">Puedes elegir los que desees.</p>
-<div class="stack sm" role="group"><button class="opt" role="checkbox" aria-checked="${S.none}" data-none><span><b>No deseo ningún servicio adicional</b></span><span class="dot"></span></button>
-${items.map(a=>`<button class="opt" role="checkbox" aria-checked="${ex.includes(a.id)}" data-extra="${a.id}"><span><b>${a.n}</b><small>${a.d}</small></span><span class="dot"></span></button>${a.id==="tratOni"&&ex.includes("tratOni")?`<div class="stack sub"><button class="opt" data-oni-change><span><b>${oniTxt()||"Elegir tratamiento"}</b><small>${S.oniOpcion?"Toca para cambiar":"Elige uno de los dos tratamientos"}</small></span></button></div>`:""}`).join("")}</div></div>
+<div class="stack sm" role="group"><button class="opt" role="checkbox" aria-checked="${S.none}" data-none><span><b>No deseo ningún servicio adicional</b>${S.none?"<small>Desmarca para ver los adicionales</small>":""}</span><span class="dot"></span></button>
+${S.none?"":items.map(a=>`<button class="opt" role="checkbox" aria-checked="${ex.includes(a.id)}" data-extra="${a.id}"><span><b>${a.n}</b><small>${a.d}</small></span><span class="dot"></span></button>${a.id==="tratOni"&&ex.includes("tratOni")?`<div class="stack sub"><button class="opt" data-oni-change><span><b>${oniTxt()||"Elegir tratamiento"}</b><small>${S.oniOpcion?"Toca para cambiar":"Elige uno de los dos tratamientos"}</small></span></button></div>`:""}`).join("")}</div></div>
 ${ready?eleccionHTML():'<p class="note" style="margin-top:16px">Selecciona un adicional o «No deseo ningún servicio adicional» para ver tu elección.</p>'}
 </div>`},
 
@@ -439,9 +433,7 @@ const off=document.getElementById("off");
 const net=()=>{off.hidden=navigator.onLine}; window.addEventListener("online",net); window.addEventListener("offline",net); net();
 if("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js").catch(()=>{});
 document.getElementById("yr").textContent=new Date().getFullYear();
-logo(document.getElementById("logo")); logo(document.getElementById("logo2"));
 route();
 </script>
 </body>
 </html>
-
